@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quest4Quill</title>
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="modal.css">
+</head>
+<body>
+  <main class="home-shell">
+    <section class="home-hero">
+      <p class="eyebrow">BIBLIOTECA</p>
+      <h1>Mis Mundos</h1>
+      <p class="hero-copy">Gestiona tus universos narrativos. Haz clic en un mundo para abrirlo.</p>
+    </section>
+
+    <section class="worlds-section">
+      <div class="world-grid" id="worldList"></div>
+
+      <button id="newWorldButton" class="create-world-card" type="button">
+        <span class="create-world-icon" aria-hidden="true">
+          <span class="create-world-icon-inner">+</span>
+        </span>
+        <span class="world-card-copy">
+          <strong>Crear Nuevo Mundo</strong>
+          <span>Empieza una nueva aventura</span>
+        </span>
+      </button>
+    </section>
+  </main>
+
+  <div class="modal-overlay hidden" id="appModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle">Nuevo mundo</h3>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" id="modalCancelButton">Cancelar</button>
+        <button type="button" id="modalConfirmButton">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

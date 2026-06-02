@@ -1,0 +1,49 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Electron App (dev)",
+      "type": "shell",
+      "command": "cd ${workspaceFolder} && $env:PATH = 'C:\\Program Files\\nodejs;' + $env:PATH; & 'C:\\Program Files\\nodejs\\npm.cmd' start",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "isBackground": false,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^(.*)\\((\\d+),(\\d+)\\):\\s+(error|warning)\\s+(.*):\\s+(.*)$",
+          "file": 1,
+          "location": 2,
+          "message": 6
+        }
+      }
+    },
+    {
+      "label": "Compile TypeScript",
+      "type": "shell",
+      "command": "cd ${workspaceFolder} && $env:PATH = 'C:\\Program Files\\nodejs;' + $env:PATH; & 'C:\\Program Files\\nodejs\\npm.cmd' run build:ts",
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": [
+        "$tsc"
+      ]
+    },
+    {
+      "label": "Build Executable (Windows)",
+      "type": "shell",
+      "command": "cd ${workspaceFolder} && $env:PATH = 'C:\\Program Files\\nodejs;' + $env:PATH; & 'C:\\Program Files\\nodejs\\npm.cmd' run build",
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Build Executable (Dev Mode - Faster)",
+      "type": "shell",
+      "command": "cd ${workspaceFolder} && $env:PATH = 'C:\\Program Files\\nodejs;' + $env:PATH; & 'C:\\Program Files\\nodejs\\npm.cmd' run build:dev",
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": []
+    }
+  ]
+}

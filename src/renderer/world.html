@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quest4Quill · Mundo</title>
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="world-page">
+    <aside class="world-sidebar">
+      <div class="world-sidebar-shell">
+        <p class="sidebar-kicker">MUNDO</p>
+        <h1 id="worldName" class="world-sidebar-title">Mundo</h1>
+
+        <nav class="sidebar-nav" aria-label="Secciones del mundo">
+          <div class="sidebar-group">
+            <p class="sidebar-group-label">GENERAL</p>
+            <button class="sidebar-tab active" type="button" data-tab="stories">Historias</button>
+            <button class="sidebar-tab" type="button" data-tab="notes">Notas</button>
+          </div>
+
+          <div class="sidebar-group">
+            <p class="sidebar-group-label">GENTE</p>
+            <button class="sidebar-tab" type="button" data-tab="characters">Personajes</button>
+            <button class="sidebar-tab" type="button" data-tab="organizations">Organizaciones</button>
+          </div>
+
+          <div class="sidebar-group">
+            <p class="sidebar-group-label">LUGARES</p>
+            <button class="sidebar-tab" type="button" data-tab="locations">Ubicaciones</button>
+          </div>
+
+          <div class="sidebar-group">
+            <p class="sidebar-group-label">COSAS</p>
+            <button class="sidebar-tab" type="button" data-tab="items">Objetos</button>
+          </div>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="world-content">
+      <button id="backButton" class="back-link" type="button">← Volver a mundos</button>
+      <section class="world-detail-card">
+        <p class="detail-kicker">Vista del mundo</p>
+        <h2 id="sectionTitle">Historias</h2>
+        <p id="sectionDescription" class="detail-copy">
+          Aquí iremos mostrando el contenido de cada sección del mundo.
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <script src="world.js"></script>
+</body>
+</html>
