@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capítulo</title>
+  <link rel="stylesheet" href="../../../../styles/base.css">
+  <link rel="stylesheet" href="../shared.css">
+  <link rel="stylesheet" href="chapter.css">
+</head>
+<body class="tab-page">
+  <main class="tab-page-shell chapter-layout">
+    <div class="page-header">
+      <div>
+        <p class="detail-kicker">Capítulo</p>
+        <h2 class="page-title" id="chapterTitle">Capítulo</h2>
+        <p class="page-copy" id="chapterDescription">Edita el resumen y el texto largo de este capítulo.</p>
+      </div>
+      <button id="backToStoriesButton" class="action-button secondary" type="button">Volver a historias</button>
+    </div>
+
+    <div class="chapter-meta" id="chapterMeta"></div>
+
+    <section class="chapter-editor" id="chapterEditor"></section>
+  </main>
+
+  <div id="deleteChapterModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="deleteChapterModalTitle">Eliminar capítulo</h3>
+      </div>
+      <div class="modal-body" id="deleteChapterModalBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" id="deleteChapterModalCancel">Cancelar</button>
+        <button type="button" id="deleteChapterModalConfirm">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="chapter.js"></script>
+</body>
+</html>

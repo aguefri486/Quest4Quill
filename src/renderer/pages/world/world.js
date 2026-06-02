@@ -1,38 +1,20 @@
 const STORAGE_KEY_WORLDS = 'quest4quill_worlds';
 const STORAGE_KEY_SIDEBAR_COLLAPSED = 'quest4quill_world_sidebar_collapsed';
 
-const sectionMap = {
-  stories: {
-    title: 'Historias',
-    description: 'Aquí podemos listar las historias de este mundo.'
-  },
-  notes: {
-    title: 'Notas',
-    description: 'Aquí podremos editar las notas generales del mundo.'
-  },
-  characters: {
-    title: 'Personajes',
-    description: 'Aquí irá el listado de personajes del mundo.'
-  },
-  organizations: {
-    title: 'Organizaciones',
-    description: 'Aquí se verán las organizaciones vinculadas al mundo.'
-  },
-  locations: {
-    title: 'Ubicaciones',
-    description: 'Aquí podremos gestionar lugares y escenarios.'
-  },
-  items: {
-    title: 'Objetos',
-    description: 'Aquí irá el inventario de objetos importantes.'
-  }
+const tabRoutes = {
+  stories: 'subpages/stories/index.html',
+  notes: 'subpages/notes/index.html',
+  characters: 'subpages/characters/index.html',
+  organizations: 'subpages/organizations/index.html',
+  locations: 'subpages/locations/index.html',
+  items: 'subpages/items/index.html'
 };
 
 const worldName = document.getElementById('worldName');
-const sectionTitle = document.getElementById('sectionTitle');
-const sectionDescription = document.getElementById('sectionDescription');
 const backButton = document.getElementById('backButton');
 const sidebarToggle = document.getElementById('sidebarToggle');
+const worldFrame = document.getElementById('worldFrame');
+const sidebarTabs = Array.from(document.querySelectorAll('.sidebar-tab'));
 
 let worlds = [];
 let currentTab = 'stories';
@@ -57,16 +39,35 @@ function getCurrentWorld() {
   return worlds.find((world) => world.id === worldId) || null;
 }
 
+function renderWorldHeader() {
+  const world = getCurrentWorld();
+
+  if (!world) {
+    window.location.href = '../home/index.html';
+    return;
+  }
+
+  if (worldName) worldName.textContent = world.name;
+  document.title = `Quest4Quill · ${world.name}`;
+}
+
+function buildFrameUrl(tabId) {
+  const route = tabRoutes[tabId] || tabRoutes.stories;
+  const frameUrl = new URL(route, window.location.href);
+  frameUrl.searchParams.set('worldId', getWorldIdFromUrl() || '');
+  return frameUrl.toString();
+}
+
 function setActiveTab(tabId) {
   currentTab = tabId;
 
-  document.querySelectorAll('.sidebar-tab').forEach((button) => {
+  sidebarTabs.forEach((button) => {
     button.classList.toggle('active', button.dataset.tab === tabId);
   });
 
-  const section = sectionMap[tabId] || sectionMap.stories;
-  if (sectionTitle) sectionTitle.textContent = section.title;
-  if (sectionDescription) sectionDescription.textContent = section.description;
+  if (worldFrame) {
+    worldFrame.src = buildFrameUrl(tabId);
+  }
 }
 
 function applySidebarState() {
@@ -74,8 +75,16 @@ function applySidebarState() {
 
   if (sidebarToggle) {
     sidebarToggle.setAttribute('aria-expanded', String(!sidebarCollapsed));
-    sidebarToggle.setAttribute('aria-label', sidebarCollapsed ? 'Desplegar barra lateral' : 'Plegar barra lateral');
+    sidebarToggle.setAttribute(
+      'aria-label',
+      sidebarCollapsed ? 'Desplegar barra lateral' : 'Plegar barra lateral'
+    );
     sidebarToggle.textContent = sidebarCollapsed ? '›' : '‹';
+  }
+
+  if (backButton) {
+    backButton.textContent = sidebarCollapsed ? '←' : '← Volver a mundos';
+    backButton.setAttribute('aria-label', 'Volver a mundos');
   }
 }
 
@@ -102,23 +111,14 @@ function toggleSidebar() {
   saveSidebarState();
 }
 
-function renderWorldHeader() {
-  const world = getCurrentWorld();
-
-  if (!world) {
-    window.location.href = '../home/index.html';
-    return;
-  }
-
-  if (worldName) worldName.textContent = world.name;
-  document.title = `Quest4Quill · ${world.name}`;
-}
-
 window.addEventListener('DOMContentLoaded', () => {
   loadWorlds();
   loadSidebarState();
   renderWorldHeader();
-  setActiveTab(currentTab);
+
+  const params = new URLSearchParams(window.location.search);
+  const initialTab = params.get('tab');
+  setActiveTab(initialTab && tabRoutes[initialTab] ? initialTab : 'stories');
 
   backButton?.addEventListener('click', () => {
     window.location.href = '../home/index.html';
@@ -126,7 +126,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   sidebarToggle?.addEventListener('click', toggleSidebar);
 
-  document.querySelectorAll('.sidebar-tab').forEach((button) => {
-    button.addEventListener('click', () => setActiveTab(button.dataset.tab || 'stories'));
+  sidebarTabs.forEach((button) => {
+    button.addEventListener('click', () => {
+      const tabId = button.dataset.tab || 'stories';
+      setActiveTab(tabId);
+    });
   });
 });

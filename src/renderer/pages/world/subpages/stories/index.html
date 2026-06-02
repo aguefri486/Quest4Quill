@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historias</title>
+  <link rel="stylesheet" href="../../../../styles/base.css">
+  <link rel="stylesheet" href="../shared.css">
+  <link rel="stylesheet" href="stories.css">
+</head>
+<body class="tab-page">
+  <main class="tab-page-shell stories-workspace">
+    <div class="page-header">
+      <div>
+        <p class="detail-kicker">Historias</p>
+        <h2 class="page-title" id="worldTitle">Historias</h2>
+        <p class="page-copy">Crea historias y organízalas en capítulos con resumen y texto largo.</p>
+      </div>
+      <button id="createStoryButton" class="action-button" type="button">Nueva historia</button>
+    </div>
+
+    <div class="stories-layout">
+      <aside class="stories-list-panel">
+        <div class="panel-heading">
+          <h3>Historias</h3>
+          <span id="storyCount">0</span>
+        </div>
+        <div id="storiesList" class="stories-list"></div>
+      </aside>
+
+      <section class="story-editor-panel" id="storyEditor"></section>
+    </div>
+  </main>
+
+  <div id="deleteStoryModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="deleteStoryModalTitle">Eliminar historia</h3>
+      </div>
+      <div class="modal-body" id="deleteStoryModalBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" id="deleteStoryModalCancel">Cancelar</button>
+        <button type="button" id="deleteStoryModalConfirm">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="stories.js"></script>
+</body>
+</html>

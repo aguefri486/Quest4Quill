@@ -42,18 +42,18 @@
             <button class="sidebar-tab" type="button" data-tab="items">Objetos</button>
           </div>
         </nav>
+
+        <button id="backButton" class="back-link" type="button">← Volver a mundos</button>
       </div>
     </aside>
 
     <main class="world-content">
-      <button id="backButton" class="back-link" type="button">← Volver a mundos</button>
-      <section class="world-detail-card">
-        <p class="detail-kicker">Vista del mundo</p>
-        <h2 id="sectionTitle">Historias</h2>
-        <p id="sectionDescription" class="detail-copy">
-          Aquí iremos mostrando el contenido de cada sección del mundo.
-        </p>
-      </section>
+      <iframe
+        id="worldFrame"
+        class="world-frame"
+        title="Contenido del mundo"
+        src="about:blank"
+      ></iframe>
     </main>
   </div>
 
