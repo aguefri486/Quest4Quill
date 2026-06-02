@@ -154,7 +154,7 @@ function confirmDeleteWorld(world) {
 }
 
 function openWorld(worldId) {
-  window.location.href = `world.html?worldId=${encodeURIComponent(worldId)}`;
+  window.location.href = `../world/world.html?worldId=${encodeURIComponent(worldId)}`;
 }
 
 function renderWorldList() {

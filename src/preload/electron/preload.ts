@@ -1,6 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
-// Exponer API segura al renderer
 contextBridge.exposeInMainWorld('electronAPI', {
   send: (channel: string, data: any) => {
     ipcRenderer.send(channel, data);

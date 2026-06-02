@@ -1,4 +1,5 @@
 const STORAGE_KEY_WORLDS = 'quest4quill_worlds';
+
 const sectionMap = {
   stories: {
     title: 'Historias',
@@ -69,7 +70,7 @@ function renderWorldHeader() {
   const world = getCurrentWorld();
 
   if (!world) {
-    window.location.href = 'index.html';
+    window.location.href = '../home/index.html';
     return;
   }
 
@@ -83,7 +84,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setActiveTab(currentTab);
 
   backButton?.addEventListener('click', () => {
-    window.location.href = 'index.html';
+    window.location.href = '../home/index.html';
   });
 
   document.querySelectorAll('.sidebar-tab').forEach((button) => {

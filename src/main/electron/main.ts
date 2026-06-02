@@ -4,7 +4,6 @@ import * as path from 'path';
 app.disableHardwareAcceleration();
 app.commandLine.appendSwitch('disable-gpu');
 
-const isDev = !app.isPackaged;
 let mainWindow: BrowserWindow | null;
 
 const createWindow = () => {
@@ -12,18 +11,16 @@ const createWindow = () => {
     width: 1200,
     height: 800,
     webPreferences: {
-      preload: path.join(__dirname, '../preload/index.js'),
+      preload: path.join(__dirname, '../../preload/electron/preload.js'),
       nodeIntegration: false,
       contextIsolation: true
     }
   });
 
-  // Siempre cargar el archivo HTML local en modo dev también
-  const startUrl = `file://${path.join(__dirname, '../renderer/index.html')}`;
+  const startUrl = `file://${path.join(__dirname, '../../renderer/pages/home/index.html')}`;
 
   mainWindow.loadURL(startUrl);
 
-  // Remover la barra de menú
   Menu.setApplicationMenu(null);
 
   mainWindow.on('closed', () => {

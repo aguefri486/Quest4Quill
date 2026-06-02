@@ -2,19 +2,19 @@
   "name": "quest4quill",
   "version": "1.0.0",
   "description": "Aplicación de escritura con Electron",
-  "main": "dist/main/index.js",
+  "main": "dist/main/electron/main.js",
   "author": "",
   "license": "MIT",
   "scripts": {
     "copy:assets": "powershell -Command \"Copy-Item -Path src/renderer -Destination dist/ -Recurse -Force\"",
     "prebuild:ts": "powershell -Command \"Copy-Item -Path src/renderer -Destination dist/ -Recurse -Force\"",
     "start": "C:\\Progra~1\\nodejs\\node.exe node_modules\\typescript\\lib\\tsc.js && powershell -Command \"Copy-Item -Path src/renderer -Destination dist/ -Recurse -Force\" && C:\\Progra~1\\nodejs\\node.exe node_modules\\electron\\cli.js .",
-    "build": "C:\\Progra~1\\nodejs\\node.exe node_modules\\typescript\\lib\\tsc.js && C:\\Progra~1\\nodejs\\node.exe node_modules\\electron-builder\\out\\cli\\cli.js --win --publish never",
-    "build:dev": "C:\\Progra~1\\nodejs\\node.exe node_modules\\typescript\\lib\\tsc.js && C:\\Progra~1\\nodejs\\node.exe node_modules\\electron-builder\\out\\cli\\cli.js --win --dir",
+    "build": "C:\\Progra~1\\nodejs\\node.exe node_modules\\typescript\\lib\\tsc.js && powershell -Command \"Copy-Item -Path src/renderer -Destination dist/ -Recurse -Force\" && C:\\Progra~1\\nodejs\\node.exe node_modules\\electron-builder\\out\\cli\\cli.js --win --publish never",
+    "build:dev": "C:\\Progra~1\\nodejs\\node.exe node_modules\\typescript\\lib\\tsc.js && powershell -Command \"Copy-Item -Path src/renderer -Destination dist/ -Recurse -Force\" && C:\\Progra~1\\nodejs\\node.exe node_modules\\electron-builder\\out\\cli\\cli.js --win --dir",
     "build:ts": "C:\\Progra~1\\nodejs\\node.exe node_modules\\typescript\\lib\\tsc.js",
     "dev": "C:\\Progra~1\\nodejs\\node.exe node_modules\\typescript\\lib\\tsc.js --watch",
-    "pack": "C:\\Progra~1\\nodejs\\node.exe node_modules\\electron-builder\\out\\cli\\cli.js --win --dir",
-    "dist": "C:\\Progra~1\\nodejs\\node.exe node_modules\\electron-builder\\out\\cli\\cli.js --win"
+    "pack": "C:\\Progra~1\\nodejs\\node.exe node_modules\\typescript\\lib\\tsc.js && powershell -Command \"Copy-Item -Path src/renderer -Destination dist/ -Recurse -Force\" && C:\\Progra~1\\nodejs\\node.exe node_modules\\electron-builder\\out\\cli\\cli.js --win --dir",
+    "dist": "C:\\Progra~1\\nodejs\\node.exe node_modules\\typescript\\lib\\tsc.js && powershell -Command \"Copy-Item -Path src/renderer -Destination dist/ -Recurse -Force\" && C:\\Progra~1\\nodejs\\node.exe node_modules\\electron-builder\\out\\cli\\cli.js --win"
   },
   "dependencies": {},
   "devDependencies": {
