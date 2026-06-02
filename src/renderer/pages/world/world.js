@@ -1,4 +1,5 @@
 const STORAGE_KEY_WORLDS = 'quest4quill_worlds';
+const STORAGE_KEY_SIDEBAR_COLLAPSED = 'quest4quill_world_sidebar_collapsed';
 
 const sectionMap = {
   stories: {
@@ -31,9 +32,11 @@ const worldName = document.getElementById('worldName');
 const sectionTitle = document.getElementById('sectionTitle');
 const sectionDescription = document.getElementById('sectionDescription');
 const backButton = document.getElementById('backButton');
+const sidebarToggle = document.getElementById('sidebarToggle');
 
 let worlds = [];
 let currentTab = 'stories';
+let sidebarCollapsed = false;
 
 function loadWorlds() {
   try {
@@ -66,6 +69,39 @@ function setActiveTab(tabId) {
   if (sectionDescription) sectionDescription.textContent = section.description;
 }
 
+function applySidebarState() {
+  document.body.classList.toggle('world-sidebar-collapsed', sidebarCollapsed);
+
+  if (sidebarToggle) {
+    sidebarToggle.setAttribute('aria-expanded', String(!sidebarCollapsed));
+    sidebarToggle.setAttribute('aria-label', sidebarCollapsed ? 'Desplegar barra lateral' : 'Plegar barra lateral');
+    sidebarToggle.textContent = sidebarCollapsed ? '›' : '‹';
+  }
+}
+
+function loadSidebarState() {
+  try {
+    sidebarCollapsed = localStorage.getItem(STORAGE_KEY_SIDEBAR_COLLAPSED) === 'true';
+  } catch (error) {
+    sidebarCollapsed = false;
+  }
+  applySidebarState();
+}
+
+function saveSidebarState() {
+  try {
+    localStorage.setItem(STORAGE_KEY_SIDEBAR_COLLAPSED, String(sidebarCollapsed));
+  } catch (error) {
+    // ignore storage failures
+  }
+}
+
+function toggleSidebar() {
+  sidebarCollapsed = !sidebarCollapsed;
+  applySidebarState();
+  saveSidebarState();
+}
+
 function renderWorldHeader() {
   const world = getCurrentWorld();
 
@@ -80,12 +116,15 @@ function renderWorldHeader() {
 
 window.addEventListener('DOMContentLoaded', () => {
   loadWorlds();
+  loadSidebarState();
   renderWorldHeader();
   setActiveTab(currentTab);
 
   backButton?.addEventListener('click', () => {
     window.location.href = '../home/index.html';
   });
+
+  sidebarToggle?.addEventListener('click', toggleSidebar);
 
   document.querySelectorAll('.sidebar-tab').forEach((button) => {
     button.addEventListener('click', () => setActiveTab(button.dataset.tab || 'stories'));
