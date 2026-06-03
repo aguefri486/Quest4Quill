@@ -67,6 +67,9 @@ function normalizeNotes(world) {
   notes.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
   notes.forEach((note, index) => {
     note.order = index + 1;
+    if (typeof note.title !== 'string') {
+      note.title = deriveNoteTitle(note.content);
+    }
   });
 }
 
@@ -77,9 +80,16 @@ function getStoryLabel(world, storyId) {
 }
 
 function getNoteTitle(note) {
-  const content = String(note?.content || '').trim();
-  if (!content) return 'Nota sin contenido';
-  return content.split(/\r?\n/)[0].slice(0, 80);
+  const explicitTitle = String(note?.title || '').trim();
+  if (explicitTitle) return explicitTitle;
+
+  return deriveNoteTitle(note?.content);
+}
+
+function deriveNoteTitle(content) {
+  const text = String(content || '').trim();
+  if (!text) return 'Nota sin título';
+  return text.split(/\r?\n/)[0].slice(0, 80);
 }
 
 function getNextNoteOrder(world) {
@@ -93,6 +103,7 @@ function createNote() {
   const now = Date.now();
   const note = {
     id: `note-${now}`,
+    title: 'Nota sin título',
     content: '',
     storyId: null,
     order: getNextNoteOrder(world),
@@ -146,7 +157,7 @@ function closeNoteModal() {
 function openDeleteNoteModal(note) {
   notePendingDeleteId = note.id;
   if (deleteNoteModalBody) {
-    deleteNoteModalBody.textContent = `¿Seguro que quieres eliminar "${getNoteTitle(note)}"? Esta acción no se puede deshacer.`;
+    deleteNoteModalBody.textContent = '¿Seguro que quieres eliminar esta nota? Esta acción no se puede deshacer.';
   }
   deleteNoteModal?.classList.remove('hidden');
   deleteNoteModal?.setAttribute('aria-hidden', 'false');
@@ -177,6 +188,7 @@ function updateCurrentNote(content) {
   const note = getNotes(world).find((item) => item.id === currentNoteId);
   if (!note) return;
 
+  note.title = deriveNoteTitle(content);
   note.content = content;
   note.updatedAt = Date.now();
   world.updatedAt = note.updatedAt;
@@ -224,6 +236,7 @@ function renderNotes() {
           const isEmpty = !String(note.content || '').trim();
           const snippet = escapeHtml(getNoteSnippet(note));
           const storyLabel = escapeHtml(getStoryLabel(world, note.storyId));
+          const noteTitle = escapeHtml(getNoteTitle(note));
 
           return `
             <button class="note-card" type="button" data-note-id="${note.id}">
@@ -231,6 +244,7 @@ function renderNotes() {
                 <span class="note-card-dot" aria-hidden="true"></span>
                 <span class="note-card-tag">${storyLabel}</span>
               </div>
+              <div class="note-card-title">${noteTitle}</div>
               <div class="${isEmpty ? 'note-card-empty' : 'note-card-snippet'}">${snippet}</div>
             </button>
           `;
@@ -242,6 +256,7 @@ function renderNotes() {
           <span class="note-card-dot" aria-hidden="true"></span>
           <span class="note-card-tag">Sin historia</span>
         </div>
+        <div class="note-card-title">Nota sin título</div>
         <div class="note-card-empty">Pulsa “Añadir nota” para crear tu primera nota rápida.</div>
       </button>
     `;

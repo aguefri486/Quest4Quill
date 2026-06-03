@@ -184,7 +184,7 @@ body {
 .modal-body {
   color: #d9cffc;
   line-height: 1.8;
-  margin-bottom: 22px;
+  margin-bottom: 28px;
   white-space: pre-wrap;
 }
 
@@ -193,6 +193,7 @@ body {
   justify-content: flex-end;
   gap: 12px;
   flex-wrap: wrap;
+  margin-top: 0;
 }
 
 .modal-actions button.secondary {
