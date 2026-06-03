@@ -59,6 +59,19 @@
   flex: 0 0 auto;
 }
 
+.note-card-tag {
+  max-width: 100%;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #cfc7ea;
+  font-size: 0.78rem;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .note-card-snippet {
   color: #d7cff8;
   line-height: 1.5;
@@ -85,6 +98,17 @@
 .note-modal-card textarea {
   min-height: 320px;
   resize: vertical;
+}
+
+.note-modal-card select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(132, 70, 228, 0.2);
+  background: rgba(13, 5, 26, 0.88);
+  color: #ede9ff;
+  font: inherit;
 }
 
 .modal-close {
