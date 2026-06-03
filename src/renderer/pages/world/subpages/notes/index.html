@@ -6,18 +6,35 @@
   <title>Notas</title>
   <link rel="stylesheet" href="../../../../styles/base.css">
   <link rel="stylesheet" href="../shared.css">
+  <link rel="stylesheet" href="notes.css">
 </head>
 <body class="tab-page">
-  <main class="tab-page-shell">
-    <div>
-      <p class="detail-kicker">Notas</p>
-      <h2 class="page-title">Notas</h2>
-      <p class="page-copy">Esta pestaña tendrá su propia pantalla para editar las notas generales del mundo.</p>
+  <main class="tab-page-shell notes-workspace">
+    <div class="page-header">
+      <div>
+        <p class="detail-kicker">Notas</p>
+        <h2 class="page-title" id="worldTitle">Notas</h2>
+        <p class="page-copy">Crea notas rápidas y ábrelas en un modal para escribir sin fricción.</p>
+      </div>
+      <button id="createNoteButton" class="action-button" type="button">Añadir nota</button>
     </div>
-    <div class="empty-state">
-      <strong>Próximamente</strong>
-      <p>Estamos dejando esta sección lista para contenido detallado.</p>
-    </div>
+
+    <section class="notes-grid" id="notesGrid" aria-label="Lista de notas"></section>
   </main>
+
+  <div id="noteModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card note-modal-card" role="dialog" aria-modal="true" aria-labelledby="noteModalTitle">
+      <div class="modal-header">
+        <h3 id="noteModalTitle">Editar nota</h3>
+        <button id="noteModalClose" class="modal-close" type="button" aria-label="Cerrar nota">×</button>
+      </div>
+      <div class="field">
+        <label for="noteInput">Contenido</label>
+        <textarea id="noteInput" placeholder="Escribe aquí..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script src="notes.js"></script>
 </body>
 </html>

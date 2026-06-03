@@ -2,12 +2,67 @@
   display: flex;
   flex-direction: column;
   gap: 22px;
+  flex: 1;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.page-header-actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 14px;
+  min-width: 0;
+}
+
+.compact-stories-strip {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(12, 6, 24, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.compact-stories-heading {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.compact-stories-list {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x proximity;
+}
+
+.compact-stories-list::-webkit-scrollbar {
+  display: none;
+}
+
+.compact-stories-list .story-card {
+  width: auto;
+  min-width: 170px;
+  flex: 0 0 auto;
+  scroll-snap-align: start;
 }
 
 .stories-layout {
   display: grid;
   grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
   gap: 18px;
+  flex: 1;
+  min-height: 0;
 }
 
 .stories-list-panel,
@@ -20,6 +75,8 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .stories-list,
@@ -27,6 +84,17 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.stories-list::-webkit-scrollbar,
+.chapters-list::-webkit-scrollbar {
+  display: none;
 }
 
 .story-card,
@@ -57,6 +125,37 @@
   font-size: 0.92rem;
 }
 
+.chapter-card-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+
+.chapter-card-title,
+.chapter-card-summary {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chapter-card-title {
+  flex: 0 1 auto;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.chapter-card-separator {
+  flex: 0 0 auto;
+  color: #8f84c8;
+}
+
+.chapter-card-summary {
+  flex: 1 1 auto;
+}
+
 .story-card.is-active,
 .chapter-card.is-active {
   border-color: rgba(153, 118, 255, 0.5);
@@ -71,6 +170,16 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+.story-editor-panel > .editor-section:last-child {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.story-editor-panel > .editor-section:last-child .chapters-list {
+  flex: 1;
 }
 
 .story-actions,
@@ -93,5 +202,30 @@
 
   .page-header {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-header-actions {
+    align-items: center;
+  }
+
+  .compact-stories-strip {
+    display: flex;
+  }
+
+  .stories-list-panel {
+    display: none;
+  }
+
+  .stories-workspace {
+    overflow: hidden;
+  }
+
+  .stories-layout {
+    gap: 16px;
+  }
+
+  .story-editor-panel {
+    max-height: none;
   }
 }

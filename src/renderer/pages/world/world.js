@@ -13,8 +13,11 @@ const tabRoutes = {
 const worldName = document.getElementById('worldName');
 const backButton = document.getElementById('backButton');
 const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebarCompactToggle = document.getElementById('sidebarCompactToggle');
+const sidebarBackdrop = document.getElementById('sidebarBackdrop');
 const worldFrame = document.getElementById('worldFrame');
 const sidebarTabs = Array.from(document.querySelectorAll('.sidebar-tab'));
+const compactSidebarMedia = window.matchMedia('(max-width: 960px)');
 
 let worlds = [];
 let currentTab = 'stories';
@@ -72,6 +75,7 @@ function setActiveTab(tabId) {
 
 function applySidebarState() {
   document.body.classList.toggle('world-sidebar-collapsed', sidebarCollapsed);
+  document.body.classList.toggle('world-compact-sidebar', compactSidebarMedia.matches);
 
   if (sidebarToggle) {
     sidebarToggle.setAttribute('aria-expanded', String(!sidebarCollapsed));
@@ -80,6 +84,19 @@ function applySidebarState() {
       sidebarCollapsed ? 'Desplegar barra lateral' : 'Plegar barra lateral'
     );
     sidebarToggle.textContent = sidebarCollapsed ? '›' : '‹';
+  }
+
+  if (sidebarCompactToggle) {
+    sidebarCompactToggle.setAttribute('aria-expanded', String(!sidebarCollapsed));
+    sidebarCompactToggle.setAttribute(
+      'aria-label',
+      sidebarCollapsed ? 'Desplegar barra lateral' : 'Plegar barra lateral'
+    );
+  }
+
+  if (sidebarBackdrop) {
+    sidebarBackdrop.classList.toggle('hidden', sidebarCollapsed);
+    sidebarBackdrop.setAttribute('aria-hidden', String(sidebarCollapsed));
   }
 
   if (backButton) {
@@ -111,6 +128,14 @@ function toggleSidebar() {
   saveSidebarState();
 }
 
+function syncSidebarForViewport() {
+  if (compactSidebarMedia.matches && !sidebarCollapsed) {
+    sidebarCollapsed = true;
+  }
+
+  applySidebarState();
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   loadWorlds();
   loadSidebarState();
@@ -125,6 +150,10 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   sidebarToggle?.addEventListener('click', toggleSidebar);
+  sidebarCompactToggle?.addEventListener('click', toggleSidebar);
+  sidebarBackdrop?.addEventListener('click', () => {
+    if (!sidebarCollapsed) toggleSidebar();
+  });
 
   sidebarTabs.forEach((button) => {
     button.addEventListener('click', () => {
@@ -132,4 +161,7 @@ window.addEventListener('DOMContentLoaded', () => {
       setActiveTab(tabId);
     });
   });
+
+  syncSidebarForViewport();
+  compactSidebarMedia.addEventListener('change', syncSidebarForViewport);
 });

@@ -16,7 +16,17 @@
         <h2 class="page-title" id="worldTitle">Historias</h2>
         <p class="page-copy">Crea historias y organízalas en capítulos con resumen y texto largo.</p>
       </div>
-      <button id="createStoryButton" class="action-button" type="button">Nueva historia</button>
+      <div class="page-header-actions">
+        <button id="createStoryButton" class="action-button" type="button">Nueva historia</button>
+
+        <div class="compact-stories-strip" aria-label="Selector de historias compacto">
+          <div class="panel-heading compact-stories-heading">
+            <h3>Historias</h3>
+            <span id="storyCountCompact">0</span>
+          </div>
+          <div id="compactStoriesList" class="compact-stories-list"></div>
+        </div>
+      </div>
     </div>
 
     <div class="stories-layout">

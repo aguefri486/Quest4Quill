@@ -2,7 +2,9 @@ const STORAGE_KEY_WORLDS = 'quest4quill_worlds';
 
 const worldTitle = document.getElementById('worldTitle');
 const storyCount = document.getElementById('storyCount');
+const storyCountCompact = document.getElementById('storyCountCompact');
 const storiesList = document.getElementById('storiesList');
+const compactStoriesList = document.getElementById('compactStoriesList');
 const storyEditor = document.getElementById('storyEditor');
 const createStoryButton = document.getElementById('createStoryButton');
 const deleteStoryModal = document.getElementById('deleteStoryModal');
@@ -397,6 +399,7 @@ function renderStoriesList() {
   const stories = getStories(world);
   const selectedStory = getSelectedStory(world);
   storyCount.textContent = String(stories.length);
+  if (storyCountCompact) storyCountCompact.textContent = String(stories.length);
 
   storiesList.innerHTML = stories.length
     ? stories
@@ -414,6 +417,10 @@ function renderStoriesList() {
         .join('')
     : '<div class="empty-state"><strong>No hay historias todavía.</strong><p>Pulsa “Nueva historia” para empezar.</p></div>';
 
+  if (compactStoriesList) {
+    compactStoriesList.innerHTML = storiesList.innerHTML;
+  }
+
   storiesList.querySelectorAll('[data-story-id]').forEach((button) => {
     button.addEventListener('click', () => {
       selectedStoryId = button.dataset.storyId || null;
@@ -421,6 +428,16 @@ function renderStoriesList() {
       render();
     });
   });
+
+  if (compactStoriesList) {
+    compactStoriesList.querySelectorAll('[data-story-id]').forEach((button) => {
+      button.addEventListener('click', () => {
+        selectedStoryId = button.dataset.storyId || null;
+        setUrlStoryId(selectedStoryId);
+        render();
+      });
+    });
+  }
 
   setupSortableList(storiesList, '[data-story-id]', reorderStoriesFromDom);
 }
@@ -442,10 +459,6 @@ function renderStoryEditor() {
 
   storyEditor.innerHTML = `
     <div class="editor-section">
-      <div class="field">
-        <label for="storyTitleInput">Nombre de la historia</label>
-        <input id="storyTitleInput" type="text" value="${escapeHtml(selectedStory.title)}" />
-      </div>
       <div class="story-actions">
         <button id="createChapterButton" class="action-button secondary" type="button">Añadir capítulo</button>
         <button id="deleteStoryButton" class="danger-button" type="button">Eliminar historia</button>
@@ -466,8 +479,11 @@ function renderStoryEditor() {
 
                   return `
                     <button class="chapter-card ${activeClass}" type="button" data-chapter-id="${chapter.id}">
-                      <strong>${escapeHtml(chapter.title)}</strong>
-                      <span>${escapeHtml(chapter.summary?.trim() || 'Sin resumen todavía.')}</span>
+                      <span class="chapter-card-main">
+                        <strong class="chapter-card-title">${escapeHtml(chapter.title)}</strong>
+                        <span class="chapter-card-separator" aria-hidden="true">·</span>
+                        <span class="chapter-card-summary">${escapeHtml(chapter.summary?.trim() || 'Sin resumen todavía.')}</span>
+                      </span>
                     </button>
                   `;
                 })
@@ -475,7 +491,6 @@ function renderStoryEditor() {
             : '<div class="empty-state"><strong>No hay capítulos todavía.</strong><p>Crea uno para empezar a escribir.</p></div>'
         }
       </div>
-      <p class="story-meta">Los capítulos se editan en su propia página para mantener esta vista ligera.</p>
     </div>
   `;
 
