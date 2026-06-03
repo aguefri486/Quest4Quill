@@ -5,11 +5,18 @@ const createLocationButton = document.getElementById('createLocationButton');
 const locationsGrid = document.getElementById('locationsGrid');
 const locationModal = document.getElementById('locationModal');
 const locationModalClose = document.getElementById('locationModalClose');
+const locationModalCloseSecondary = document.getElementById('locationModalCloseSecondary');
+const deleteLocationButton = document.getElementById('deleteLocationButton');
+const deleteLocationModal = document.getElementById('deleteLocationModal');
+const deleteLocationModalBody = document.getElementById('deleteLocationModalBody');
+const deleteLocationModalCancel = document.getElementById('deleteLocationModalCancel');
+const deleteLocationModalConfirm = document.getElementById('deleteLocationModalConfirm');
 const locationNameInput = document.getElementById('locationNameInput');
 const locationNotesInput = document.getElementById('locationNotesInput');
 
 let worlds = [];
 let currentLocationId = null;
+let locationPendingDeleteId = null;
 
 function loadWorlds() {
   try {
@@ -40,6 +47,12 @@ function getLocations(world) {
   return world.locations;
 }
 
+function getRegions(world) {
+  if (!world) return [];
+  if (!Array.isArray(world.regions)) world.regions = [];
+  return world.regions;
+}
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll('&', '&amp;')
@@ -59,6 +72,11 @@ function normalizeLocations(world) {
 
 function getNextLocationOrder(world) {
   return getLocations(world).reduce((highest, location) => Math.max(highest, Number(location.order) || 0), 0) + 1;
+}
+
+function getLocationTitle(location) {
+  const name = String(location?.name || '').trim();
+  return name || 'Ubicación sin nombre';
 }
 
 function createLocation() {
@@ -102,6 +120,61 @@ function closeLocationModal() {
   locationModal?.classList.add('hidden');
   locationModal?.setAttribute('aria-hidden', 'true');
   currentLocationId = null;
+}
+
+function getLocationDeleteDetails(world, location) {
+  const containingRegions = getRegions(world).filter(
+    (region) => Array.isArray(region.locationIds) && region.locationIds.includes(location.id)
+  );
+
+  return { containingRegions };
+}
+
+function openDeleteLocationModal(location) {
+  const world = getCurrentWorld();
+  if (!world) return;
+
+  const details = getLocationDeleteDetails(world, location);
+  locationPendingDeleteId = location.id;
+
+  if (deleteLocationModalBody) {
+    deleteLocationModalBody.textContent =
+      `¿Seguro que quieres eliminar "${getLocationTitle(location)}"? Esta acción no se puede deshacer. ` +
+      (details.containingRegions.length
+        ? `Está enlazada en ${details.containingRegions.length} región${details.containingRegions.length === 1 ? '' : 'es'}: ${details.containingRegions.map((region) => region.name).join(', ')}. `
+        : '') +
+      'La ubicación se desvinculará de todas las regiones.';
+  }
+
+  deleteLocationModal?.classList.remove('hidden');
+  deleteLocationModal?.setAttribute('aria-hidden', 'false');
+}
+
+function closeDeleteLocationModal() {
+  locationPendingDeleteId = null;
+  deleteLocationModal?.classList.add('hidden');
+  deleteLocationModal?.setAttribute('aria-hidden', 'true');
+}
+
+function deleteLocation(locationId) {
+  const world = getCurrentWorld();
+  if (!world) return;
+
+  world.locations = getLocations(world).filter((location) => location.id !== locationId);
+  getRegions(world).forEach((region) => {
+    if (Array.isArray(region.locationIds)) {
+      region.locationIds = region.locationIds.filter((id) => id !== locationId);
+    }
+  });
+
+  world.updatedAt = Date.now();
+
+  if (currentLocationId === locationId) {
+    currentLocationId = world.locations[0]?.id || null;
+  }
+
+  saveWorlds();
+  renderLocations();
 }
 
 function updateCurrentLocation(name, notes) {
@@ -174,9 +247,31 @@ window.addEventListener('DOMContentLoaded', () => {
   loadWorlds();
   createLocationButton?.addEventListener('click', createLocation);
   locationModalClose?.addEventListener('click', closeLocationModal);
+  locationModalCloseSecondary?.addEventListener('click', closeLocationModal);
+  deleteLocationButton?.addEventListener('click', () => {
+    const world = getCurrentWorld();
+    if (!world || !currentLocationId) return;
+
+    const location = getLocations(world).find((item) => item.id === currentLocationId);
+    if (!location) return;
+
+    openDeleteLocationModal(location);
+  });
   locationModal?.addEventListener('click', (event) => {
     if (event.target === locationModal) {
       closeLocationModal();
+    }
+  });
+  deleteLocationModalCancel?.addEventListener('click', closeDeleteLocationModal);
+  deleteLocationModalConfirm?.addEventListener('click', () => {
+    if (!locationPendingDeleteId) return;
+    deleteLocation(locationPendingDeleteId);
+    closeDeleteLocationModal();
+    closeLocationModal();
+  });
+  deleteLocationModal?.addEventListener('click', (event) => {
+    if (event.target === deleteLocationModal) {
+      closeDeleteLocationModal();
     }
   });
   locationNameInput?.addEventListener('input', () => {

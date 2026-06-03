@@ -41,6 +41,19 @@
     </div>
   </main>
 
+  <div id="deleteRegionModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="deleteRegionModalTitle">
+      <div class="modal-header">
+        <h3 id="deleteRegionModalTitle">Eliminar región</h3>
+      </div>
+      <div class="modal-body" id="deleteRegionModalBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" id="deleteRegionModalCancel">Cancelar</button>
+        <button type="button" class="danger-button" id="deleteRegionModalConfirm">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="regions.js"></script>
 </body>
 </html>

@@ -36,6 +36,23 @@
         <label for="noteInput">Contenido</label>
         <textarea id="noteInput" placeholder="Escribe aquí..."></textarea>
       </div>
+      <div class="modal-actions note-modal-actions">
+        <button id="deleteNoteButton" class="danger-button" type="button">Eliminar nota</button>
+        <button id="noteModalCloseSecondary" class="secondary" type="button">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="deleteNoteModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="deleteNoteModalTitle">
+      <div class="modal-header">
+        <h3 id="deleteNoteModalTitle">Eliminar nota</h3>
+      </div>
+      <div class="modal-body" id="deleteNoteModalBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" id="deleteNoteModalCancel">Cancelar</button>
+        <button type="button" class="danger-button" id="deleteNoteModalConfirm">Eliminar</button>
+      </div>
     </div>
   </div>
 

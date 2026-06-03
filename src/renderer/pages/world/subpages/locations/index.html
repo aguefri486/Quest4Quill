@@ -36,6 +36,23 @@
         <label for="locationNotesInput">Notas</label>
         <textarea id="locationNotesInput" placeholder="Texto explicativo..."></textarea>
       </div>
+      <div class="modal-actions">
+        <button id="deleteLocationButton" class="danger-button" type="button">Eliminar ubicación</button>
+        <button id="locationModalCloseSecondary" class="secondary" type="button">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="deleteLocationModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="deleteLocationModalTitle">
+      <div class="modal-header">
+        <h3 id="deleteLocationModalTitle">Eliminar ubicación</h3>
+      </div>
+      <div class="modal-body" id="deleteLocationModalBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" id="deleteLocationModalCancel">Cancelar</button>
+        <button type="button" class="danger-button" id="deleteLocationModalConfirm">Eliminar</button>
+      </div>
     </div>
   </div>
 

@@ -5,11 +5,18 @@ const createNoteButton = document.getElementById('createNoteButton');
 const notesGrid = document.getElementById('notesGrid');
 const noteModal = document.getElementById('noteModal');
 const noteModalClose = document.getElementById('noteModalClose');
+const noteModalCloseSecondary = document.getElementById('noteModalCloseSecondary');
+const deleteNoteButton = document.getElementById('deleteNoteButton');
+const deleteNoteModal = document.getElementById('deleteNoteModal');
+const deleteNoteModalBody = document.getElementById('deleteNoteModalBody');
+const deleteNoteModalCancel = document.getElementById('deleteNoteModalCancel');
+const deleteNoteModalConfirm = document.getElementById('deleteNoteModalConfirm');
 const noteStorySelect = document.getElementById('noteStorySelect');
 const noteInput = document.getElementById('noteInput');
 
 let worlds = [];
 let currentNoteId = null;
+let notePendingDeleteId = null;
 
 function loadWorlds() {
   try {
@@ -67,6 +74,12 @@ function getStoryLabel(world, storyId) {
   if (!storyId) return 'Sin historia';
   const story = getStories(world).find((item) => item.id === storyId);
   return story ? story.title : 'Historia eliminada';
+}
+
+function getNoteTitle(note) {
+  const content = String(note?.content || '').trim();
+  if (!content) return 'Nota sin contenido';
+  return content.split(/\r?\n/)[0].slice(0, 80);
 }
 
 function getNextNoteOrder(world) {
@@ -128,6 +141,33 @@ function closeNoteModal() {
   noteModal?.classList.add('hidden');
   noteModal?.setAttribute('aria-hidden', 'true');
   currentNoteId = null;
+}
+
+function openDeleteNoteModal(note) {
+  notePendingDeleteId = note.id;
+  if (deleteNoteModalBody) {
+    deleteNoteModalBody.textContent = `¿Seguro que quieres eliminar "${getNoteTitle(note)}"? Esta acción no se puede deshacer.`;
+  }
+  deleteNoteModal?.classList.remove('hidden');
+  deleteNoteModal?.setAttribute('aria-hidden', 'false');
+}
+
+function closeDeleteNoteModal() {
+  notePendingDeleteId = null;
+  deleteNoteModal?.classList.add('hidden');
+  deleteNoteModal?.setAttribute('aria-hidden', 'true');
+}
+
+function deleteNote(noteId) {
+  const world = getCurrentWorld();
+  if (!world) return;
+
+  const notes = getNotes(world).filter((note) => note.id !== noteId);
+  world.notes = notes;
+  world.updatedAt = Date.now();
+  saveWorlds();
+  currentNoteId = notes[0]?.id || null;
+  renderNotes();
 }
 
 function updateCurrentNote(content) {
@@ -221,9 +261,31 @@ window.addEventListener('DOMContentLoaded', () => {
   loadWorlds();
   createNoteButton?.addEventListener('click', createNote);
   noteModalClose?.addEventListener('click', closeNoteModal);
+  noteModalCloseSecondary?.addEventListener('click', closeNoteModal);
+  deleteNoteButton?.addEventListener('click', () => {
+    const world = getCurrentWorld();
+    if (!world || !currentNoteId) return;
+
+    const note = getNotes(world).find((item) => item.id === currentNoteId);
+    if (!note) return;
+
+    openDeleteNoteModal(note);
+  });
   noteModal?.addEventListener('click', (event) => {
     if (event.target === noteModal) {
       closeNoteModal();
+    }
+  });
+  deleteNoteModalCancel?.addEventListener('click', closeDeleteNoteModal);
+  deleteNoteModalConfirm?.addEventListener('click', () => {
+    if (!notePendingDeleteId) return;
+    deleteNote(notePendingDeleteId);
+    closeDeleteNoteModal();
+    closeNoteModal();
+  });
+  deleteNoteModal?.addEventListener('click', (event) => {
+    if (event.target === deleteNoteModal) {
+      closeDeleteNoteModal();
     }
   });
   noteInput?.addEventListener('input', (event) => {

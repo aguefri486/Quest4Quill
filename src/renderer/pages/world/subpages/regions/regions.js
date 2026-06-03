@@ -14,9 +14,14 @@ const regionsList = document.getElementById('regionsList');
 const compactRegionsList = document.getElementById('compactRegionsList');
 const regionEditor = document.getElementById('regionEditor');
 const createRegionButton = document.getElementById('createRegionButton');
+const deleteRegionModal = document.getElementById('deleteRegionModal');
+const deleteRegionModalBody = document.getElementById('deleteRegionModalBody');
+const deleteRegionModalCancel = document.getElementById('deleteRegionModalCancel');
+const deleteRegionModalConfirm = document.getElementById('deleteRegionModalConfirm');
 
 let worlds = [];
 let selectedRegionId = null;
+let regionPendingDeleteId = null;
 
 function loadWorlds() {
   try {
@@ -95,6 +100,14 @@ function findLocationByName(world, name) {
   return getLocations(world).find(
     (location) => String(location.name || '').trim().toLowerCase() === normalizedName
   ) || null;
+}
+
+function getRegionById(world, regionId) {
+  return getRegions(world).find((region) => region.id === regionId) || null;
+}
+
+function getRegionParents(world, regionId) {
+  return getRegions(world).filter((region) => Array.isArray(region.childRegionIds) && region.childRegionIds.includes(regionId));
 }
 
 function getWritableSelectOptions(items) {
@@ -423,6 +436,81 @@ function toggleRegionLocation(regionId, locationId) {
   renderRegionEditor();
 }
 
+function getRegionDeleteDetails(world, region) {
+  const parents = getRegionParents(world, region.id);
+  const childRegions = (region.childRegionIds || [])
+    .map((childId) => getRegionById(world, childId))
+    .filter(Boolean);
+  const locations = (region.locationIds || [])
+    .map((locationId) => getLocations(world).find((item) => item.id === locationId))
+    .filter(Boolean);
+
+  return { parents, childRegions, locations };
+}
+
+function openDeleteRegionModal(region) {
+  const world = getCurrentWorld();
+  if (!world) return;
+
+  const details = getRegionDeleteDetails(world, region);
+  regionPendingDeleteId = region.id;
+
+  const parentsText = details.parents.length
+    ? `Está contenida en: ${details.parents.map((item) => item.name).join(', ')}. `
+    : '';
+  const childRegionsText = details.childRegions.length
+    ? `Contiene ${details.childRegions.length} región interior${details.childRegions.length === 1 ? '' : 'es'}. `
+    : '';
+  const locationsText = details.locations.length
+    ? `Contiene ${details.locations.length} ubicación${details.locations.length === 1 ? '' : 'es'}. `
+    : '';
+
+  if (deleteRegionModalBody) {
+    deleteRegionModalBody.textContent =
+      `¿Seguro que quieres eliminar "${region.name}"? Esta acción no se puede deshacer. ` +
+      parentsText +
+      childRegionsText +
+      locationsText +
+      'Las regiones y ubicaciones enlazadas no se borrarán, solo se desvincularán.';
+  }
+
+  deleteRegionModal?.classList.remove('hidden');
+  deleteRegionModal?.setAttribute('aria-hidden', 'false');
+}
+
+function closeDeleteRegionModal() {
+  regionPendingDeleteId = null;
+  deleteRegionModal?.classList.add('hidden');
+  deleteRegionModal?.setAttribute('aria-hidden', 'true');
+}
+
+function deleteRegion(regionId) {
+  const world = getCurrentWorld();
+  if (!world) return;
+
+  const regionToDelete = getRegionById(world, regionId);
+  if (!regionToDelete) return;
+
+  world.regions = getRegions(world)
+    .filter((region) => region.id !== regionId)
+    .map((region) => ({
+      ...region,
+      childRegionIds: Array.isArray(region.childRegionIds)
+        ? region.childRegionIds.filter((childId) => childId !== regionId)
+        : []
+    }));
+
+  world.updatedAt = Date.now();
+
+  if (selectedRegionId === regionId) {
+    selectedRegionId = world.regions[0]?.id || null;
+    setUrlRegionId(selectedRegionId);
+  }
+
+  saveWorlds();
+  render();
+}
+
 function addRegionChildByName(regionId, value) {
   const world = getCurrentWorld();
   if (!world) return;
@@ -569,6 +657,9 @@ function renderRegionEditor() {
           </select>
         </div>
       </div>
+      <div class="story-actions">
+        <button id="deleteRegionButton" class="danger-button" type="button">Eliminar región</button>
+      </div>
     </div>
 
     <div class="editor-section">
@@ -690,6 +781,10 @@ function renderRegionEditor() {
     updateRegionField(region.id, 'notes', event.target.value);
   });
 
+  document.getElementById('deleteRegionButton')?.addEventListener('click', () => {
+    openDeleteRegionModal(region);
+  });
+
   setupWritableSelect({
     inputId: 'childRegionInput',
     panelId: 'childRegionPanel',
@@ -763,5 +858,16 @@ function render() {
 window.addEventListener('DOMContentLoaded', () => {
   loadWorlds();
   createRegionButton?.addEventListener('click', createRegion);
+  deleteRegionModalCancel?.addEventListener('click', closeDeleteRegionModal);
+  deleteRegionModalConfirm?.addEventListener('click', () => {
+    if (!regionPendingDeleteId) return;
+    deleteRegion(regionPendingDeleteId);
+    closeDeleteRegionModal();
+  });
+  deleteRegionModal?.addEventListener('click', (event) => {
+    if (event.target === deleteRegionModal) {
+      closeDeleteRegionModal();
+    }
+  });
   render();
 });
