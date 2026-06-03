@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regiones</title>
+  <link rel="stylesheet" href="../../../../styles/base.css">
+  <link rel="stylesheet" href="../shared.css">
+  <link rel="stylesheet" href="regions.css">
+</head>
+<body class="tab-page">
+  <main class="tab-page-shell regions-workspace">
+    <div class="page-header">
+      <div>
+        <p class="detail-kicker">Lugares</p>
+        <h2 class="page-title" id="worldTitle">Regiones</h2>
+      </div>
+      <div class="page-header-actions">
+        <button id="createRegionButton" class="action-button" type="button">Añadir región</button>
+
+        <div class="compact-regions-strip" aria-label="Selector de regiones compacto">
+          <div class="panel-heading compact-regions-heading">
+            <h3>Regiones</h3>
+            <span id="regionCountCompact">0</span>
+          </div>
+          <div id="compactRegionsList" class="compact-regions-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="regions-layout">
+      <aside class="regions-list-panel">
+        <div class="panel-heading">
+          <h3>Regiones</h3>
+          <span id="regionCount">0</span>
+        </div>
+        <div id="regionsList" class="regions-list"></div>
+      </aside>
+
+      <section class="region-editor-panel" id="regionEditor"></section>
+    </div>
+  </main>
+
+  <script src="regions.js"></script>
+</body>
+</html>

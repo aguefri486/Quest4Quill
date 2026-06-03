@@ -6,18 +6,39 @@
   <title>Ubicaciones</title>
   <link rel="stylesheet" href="../../../../styles/base.css">
   <link rel="stylesheet" href="../shared.css">
+  <link rel="stylesheet" href="locations.css">
 </head>
 <body class="tab-page">
-  <main class="tab-page-shell">
-    <div>
-      <p class="detail-kicker">Ubicaciones</p>
-      <h2 class="page-title">Ubicaciones</h2>
-      <p class="page-copy">Esta pestaña separada servirá para escenarios y lugares.</p>
+  <main class="tab-page-shell locations-workspace">
+    <div class="page-header">
+      <div>
+        <p class="detail-kicker">Lugares</p>
+        <h2 class="page-title" id="worldTitle">Ubicaciones</h2>
+        <p class="page-copy">Guarda ubicaciones concretas con un nombre y texto explicativo breve.</p>
+      </div>
+      <button id="createLocationButton" class="action-button" type="button">Añadir ubicación</button>
     </div>
-    <div class="empty-state">
-      <strong>Próximamente</strong>
-      <p>Queda lista para crecer cuando toque modelar lugares.</p>
-    </div>
+
+    <section class="locations-grid" id="locationsGrid" aria-label="Lista de ubicaciones"></section>
   </main>
+
+  <div id="locationModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card location-modal-card" role="dialog" aria-modal="true" aria-labelledby="locationModalTitle">
+      <div class="modal-header">
+        <h3 id="locationModalTitle">Editar ubicación</h3>
+        <button id="locationModalClose" class="modal-close" type="button" aria-label="Cerrar ubicación">×</button>
+      </div>
+      <div class="field">
+        <label for="locationNameInput">Nombre</label>
+        <input id="locationNameInput" type="text" placeholder="Nombre de la ubicación" />
+      </div>
+      <div class="field">
+        <label for="locationNotesInput">Notas</label>
+        <textarea id="locationNotesInput" placeholder="Texto explicativo..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script src="locations.js"></script>
 </body>
 </html>

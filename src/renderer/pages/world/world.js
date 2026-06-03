@@ -6,6 +6,7 @@ const tabRoutes = {
   notes: 'subpages/notes/index.html',
   characters: 'subpages/characters/index.html',
   organizations: 'subpages/organizations/index.html',
+  regions: 'subpages/regions/index.html',
   locations: 'subpages/locations/index.html',
   items: 'subpages/items/index.html'
 };

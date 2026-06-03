@@ -90,7 +90,8 @@ body {
 }
 
 .field input,
-.field textarea {
+.field textarea,
+.field select {
   width: 100%;
   padding: 14px 16px;
   border-radius: 16px;
@@ -98,6 +99,23 @@ body {
   background: rgba(13, 5, 26, 0.88);
   color: #ede9ff;
   font: inherit;
+}
+
+.field select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #bcb2df 50%),
+    linear-gradient(135deg, #bcb2df 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 42px;
+}
+
+.field select option {
+  background: #14091f;
+  color: #ede9ff;
 }
 
 .field textarea {
