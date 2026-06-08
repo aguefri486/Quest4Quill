@@ -1,0 +1,439 @@
+.organizations-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.organization-list-view,
+.organization-detail-view {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  flex: 1;
+  min-height: 0;
+}
+
+.organizations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.organizations-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.organization-card,
+.create-organization-card {
+  width: 100%;
+  min-height: 104px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: rgba(24, 12, 42, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  text-align: left;
+  color: #e8e3ff;
+}
+
+.organization-card {
+  position: relative;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.organization-card:hover,
+.create-organization-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(160, 120, 255, 0.35);
+  background: rgba(32, 15, 54, 0.98);
+}
+
+.organization-card-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.organization-card-copy strong {
+  color: #fff;
+  font-size: 1.08rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.organization-card-copy span,
+.organization-card-copy small {
+  color: #bcb2df;
+  font-size: 0.94rem;
+}
+
+.create-organization-card {
+  background: linear-gradient(180deg, rgba(18, 18, 22, 0.96), rgba(12, 12, 15, 0.98));
+  border: 2px dashed rgba(140, 140, 150, 0.35);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.create-organization-card span {
+  color: #a8a8b1;
+}
+
+.create-organization-card strong {
+  color: #fff;
+}
+
+.create-organization-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  border: 2px dashed rgba(140, 140, 150, 0.35);
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.02);
+  color: #d8d8df;
+  font-size: 1.6rem;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.organization-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.organization-detail-title {
+  min-width: 0;
+}
+
+.organization-detail-title h2 {
+  margin-top: 10px;
+}
+
+.organization-detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.organization-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 18px;
+  min-height: 0;
+}
+
+.organization-about-panel,
+.organization-info-panel,
+.organization-roster-panel {
+  min-width: 0;
+  padding: 22px;
+  border-radius: 22px;
+  background: rgba(12, 6, 24, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.organization-about-panel h3,
+.organization-info-panel h3,
+.organization-roster-panel h3 {
+  color: #f3efff;
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+}
+
+.organization-about-text {
+  color: #d9cffc;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.organization-empty-text {
+  color: #8f84c8;
+  line-height: 1.7;
+}
+
+.organization-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.organization-info-list div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.organization-info-list dt {
+  color: #8f84c8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.organization-info-list dd {
+  color: #efeaff;
+  line-height: 1.5;
+}
+
+.organization-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.organization-tag {
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #ebe6ff;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.78rem;
+}
+
+.organization-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.organization-roster-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.organization-role-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.organization-role-section + .organization-role-section {
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.organization-role-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.organization-role-heading h4 {
+  color: #f3efff;
+  font-size: 1rem;
+}
+
+.organization-role-heading span {
+  color: #bcb2df;
+  font-size: 0.9rem;
+}
+
+.organization-person-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.organization-person-card {
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #f1ecff;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.organization-modal-card {
+  width: min(100%, 860px);
+  max-height: min(90vh, 820px);
+  display: flex;
+  flex-direction: column;
+}
+
+.organization-modal-body {
+  min-height: 0;
+  overflow: auto;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.organization-modal-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 220px);
+  gap: 14px;
+}
+
+.organization-modal-card textarea {
+  min-height: 150px;
+}
+
+.organization-edit-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.organization-edit-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.organization-edit-heading h4 {
+  color: #f3efff;
+  font-size: 1rem;
+}
+
+.organization-edit-heading span {
+  color: #bcb2df;
+  font-size: 0.9rem;
+}
+
+.organization-check-list,
+.organization-role-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.organization-role-edit-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+
+.organization-role-edit-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.organization-role-edit-panel h5 {
+  color: #e8e1ff;
+  font-size: 0.95rem;
+}
+
+.organization-check-option {
+  min-height: 48px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.organization-check-option:has(input:checked) {
+  border-color: rgba(153, 118, 255, 0.5);
+  background: rgba(142, 92, 255, 0.2);
+}
+
+.organization-check-option input {
+  width: 16px;
+  height: 16px;
+  accent-color: #8e5cff;
+  flex: 0 0 auto;
+}
+
+.organization-check-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.organization-check-copy strong {
+  color: #fff;
+  font-size: 0.92rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.organization-check-copy small {
+  color: #bcb2df;
+  font-size: 0.78rem;
+}
+
+.organization-modal-actions {
+  margin-top: 18px;
+}
+
+.modal-close {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+@media (max-width: 900px) {
+  .organization-detail-header,
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .organization-detail-actions {
+    justify-content: flex-start;
+  }
+
+  .organization-main-grid,
+  .organization-modal-grid,
+  .organization-role-edit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .organizations-grid,
+  .organization-person-list,
+  .organization-check-list {
+    grid-template-columns: 1fr;
+  }
+
+  .organization-card,
+  .create-organization-card {
+    padding: 16px;
+  }
+}
