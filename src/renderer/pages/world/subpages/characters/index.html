@@ -6,18 +6,64 @@
   <title>Personajes</title>
   <link rel="stylesheet" href="../../../../styles/base.css">
   <link rel="stylesheet" href="../shared.css">
+  <link rel="stylesheet" href="characters.css">
 </head>
 <body class="tab-page">
-  <main class="tab-page-shell">
-    <div>
-      <p class="detail-kicker">Personajes</p>
-      <h2 class="page-title">Personajes</h2>
-      <p class="page-copy">Aquí irá la gestión de personajes del mundo.</p>
-    </div>
-    <div class="empty-state">
-      <strong>Próximamente</strong>
-      <p>Esta página ya está separada para crecer sin hacer el archivo gigante.</p>
-    </div>
+  <main class="tab-page-shell characters-workspace">
+    <section id="characterListView" class="character-list-view">
+      <div class="page-header">
+        <div>
+          <p class="detail-kicker">Personajes</p>
+          <h2 class="page-title" id="worldTitle">Personajes</h2>
+        </div>
+        <div class="page-header-actions">
+          <button id="createCharacterButton" class="action-button" type="button">Añadir personaje</button>
+        </div>
+      </div>
+
+      <div class="character-groups">
+        <section class="character-group">
+          <div class="panel-heading">
+            <h3>Principales</h3>
+            <span id="principalCount">0</span>
+          </div>
+          <div id="principalCharacters" class="character-group-grid" aria-label="Lista de personajes principales"></div>
+        </section>
+
+        <section class="character-group">
+          <div class="panel-heading">
+            <h3>Mayores</h3>
+            <span id="majorCount">0</span>
+          </div>
+          <div id="majorCharacters" class="character-group-grid" aria-label="Lista de personajes mayores"></div>
+        </section>
+
+        <section class="character-group">
+          <div class="panel-heading">
+            <h3>Menores</h3>
+            <span id="minorCount">0</span>
+          </div>
+          <div id="minorCharacters" class="character-group-grid" aria-label="Lista de personajes menores"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="characterDetailView" class="character-detail-view hidden" aria-live="polite"></section>
   </main>
+
+  <div id="deleteCharacterModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="deleteCharacterModalTitle">
+      <div class="modal-header">
+        <h3 id="deleteCharacterModalTitle">Eliminar personaje</h3>
+      </div>
+      <div class="modal-body" id="deleteCharacterModalBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" id="deleteCharacterModalCancel">Cancelar</button>
+        <button type="button" class="danger-button" id="deleteCharacterModalConfirm">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="characters.js"></script>
 </body>
 </html>
