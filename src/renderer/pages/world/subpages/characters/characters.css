@@ -609,15 +609,31 @@
   font-size: 0.9rem;
 }
 
+
 .relation-modal-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(220px, 0.8fr);
   gap: 16px;
 }
 
+/* Keep relation modal compact and only as tall as its content */
 .relation-modal-card {
-  width: fit-content;
-  max-width: min(100%, 460px);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: auto;
+  max-width: min(100%, 520px);
+  padding: 18px;
+  background-clip: padding-box;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+
+/* Reduce modal-body spacing only for relation modal to avoid tall gaps */
+.relation-modal-card .modal-body {
+  margin-bottom: 12px;
+  padding: 0;
 }
 
 .relation-modal-preview,
@@ -667,6 +683,33 @@
   justify-content: flex-end;
 }
 
+/* Ensure modal content does not stretch vertically unnecessarily */
+.relation-modal-grid,
+.relation-modal-preview,
+.relation-modal-view {
+  align-items: start;
+}
+
+/* Compact view overrides when overlay has .relation-view */
+.modal-overlay.relation-view .relation-modal-card {
+  padding: 12px 14px;
+  max-width: min(100%, 480px);
+}
+
+.modal-overlay.relation-view .relation-modal-card .modal-header {
+  display: none;
+}
+
+.modal-overlay.relation-view .relation-modal-card .modal-body {
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.modal-overlay.relation-view .relation-modal-card .modal-actions {
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+
 .relation-modal-view-main {
   display: flex;
   flex-direction: column;
@@ -684,6 +727,22 @@
   justify-content: flex-end;
 }
 
+/* Cuando estamos editando, apilar los botones verticalmente y poner el botón de eliminar separado abajo */
+.character-relation-composer.character-relation-composer-editing .character-relation-composer-buttons {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.character-relation-composer.character-relation-composer-editing .character-relation-composer-buttons .action-button,
+.character-relation-composer.character-relation-composer-editing .character-relation-composer-buttons .secondary {
+  width: 100%;
+}
+
+.character-relation-composer.character-relation-composer-editing .character-relation-composer-buttons .danger-button {
+  margin-top: 8px;
+  width: 100%;
+}
+
 .character-relation-composer-actions label {
   min-height: 0;
 }
@@ -699,6 +758,27 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+/* Alinear verticalmente nombre y botón en el header de la relación */
+.character-relation-card-header {
+  align-items: center; /* asegurar centrado */
+}
+
+.character-relation-name {
+  justify-content: center; /* centrar el contenido del nombre verticalmente */
+}
+
+.character-relation-name strong,
+.character-relation-name small {
+  margin: 0; /* evitar márgenes que desalineen */
+}
+
+.character-relation-card-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .character-relation-section {

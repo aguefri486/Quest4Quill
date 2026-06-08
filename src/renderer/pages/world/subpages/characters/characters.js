@@ -1076,8 +1076,11 @@ function closeRelationComposer() {
 
 function closeRelationModal() {
   relationModalState = null;
-  relationModal?.classList.add('hidden');
-  relationModal?.setAttribute('aria-hidden', 'true');
+  if (relationModal) {
+    relationModal.classList.remove('relation-view');
+    relationModal.classList.add('hidden');
+    relationModal.setAttribute('aria-hidden', 'true');
+  }
 }
 
 function openRelationModal(character, targetId, mode = 'view') {
@@ -1111,7 +1114,8 @@ function openRelationModal(character, targetId, mode = 'view') {
     .join('');
 
   if (relationModalTitle) {
-    relationModalTitle.textContent = mode === 'edit' ? `Editar relación con ${targetName}` : `Relación con ${targetName}`;
+    // In view mode we hide the header entirely; in edit mode show the full title
+    relationModalTitle.textContent = mode === 'edit' ? `Editar relación con ${targetName}` : '';
   }
 
   if (relationModalBody) {
@@ -1140,15 +1144,8 @@ function openRelationModal(character, targetId, mode = 'view') {
           </div>
         `
         : `
-          <div class="relation-modal-view">
-            <div class="relation-modal-view-main">
-              <strong>${escapeHtml(targetName)}</strong>
-              <span>${escapeHtml(getRelationLabel(relationType))}</span>
-              <div class="relation-modal-view-note">${relationNote ? escapeHtml(relationNote) : 'Sin nota guardada.'}</div>
-            </div>
-            <div class="relation-modal-view-actions">
-              <button type="button" class="secondary" data-open-character-id="${escapeHtml(targetId)}">Abrir personaje</button>
-            </div>
+          <div class="relation-modal-view relation-modal-view-compact">
+            <div class="relation-modal-view-note">${relationNote ? escapeHtml(relationNote) : 'Sin nota guardada.'}</div>
           </div>
         `;
   }
@@ -1164,8 +1161,12 @@ function openRelationModal(character, targetId, mode = 'view') {
     relationModalDelete.classList.toggle('hidden', mode !== 'edit');
   }
 
-  relationModal?.classList.remove('hidden');
-  relationModal?.setAttribute('aria-hidden', 'false');
+  // Toggle a class on the overlay so we can apply view-mode specific CSS
+  if (relationModal) {
+    relationModal.classList.toggle('relation-view', mode === 'view');
+    relationModal.classList.remove('hidden');
+    relationModal.setAttribute('aria-hidden', 'false');
+  }
 }
 
 function saveOpenRelationModal() {
@@ -1392,8 +1393,8 @@ function renderRelationComposer(character, world) {
         </div>
         <div class="field character-relation-composer-actions">
           <label>&nbsp;</label>
-          <div class="character-relation-composer-buttons">
-            <button id="addRelationButton" class="action-button" type="button">Añadir</button>
+            <div class="character-relation-composer-buttons">
+            <button id="addRelationButton" class="action-button" type="button">${isEditing ? 'Guardar' : 'Añadir'}</button>
             ${
               isEditing
                 ? `
@@ -1626,44 +1627,6 @@ function renderCharacterDetail(character) {
                     ${renderSelectOptions(regions.map((region) => ({ id: region.id, label: getRegionName(region) })), character.birthRegionId, 'Sin regiones')}
                   </select>
                 </div>
-                <div class="field full-width">
-                  <label>Residencia</label>
-                  <div class="character-select-stack">
-                    ${renderWritableSelectMarkup({
-                      inputId: 'characterResidenceInput',
-                      panelId: 'characterResidencePanel',
-                      placeholder: 'Escribe una región...',
-                      options: regionOptions
-                    })}
-                    ${renderTagList(
-                      residenceRegions,
-                      getRegionName,
-                      'Aún no hay regiones de residencia.',
-                      'data-remove-character-residence-id'
-                    )}
-                  </div>
-                </div>
-                <div class="field full-width">
-                  <label>Objetos</label>
-                  <div class="character-select-stack">
-                    ${renderWritableSelectMarkup({
-                      inputId: 'characterItemsInput',
-                      panelId: 'characterItemsPanel',
-                      placeholder: 'Escribe un objeto...',
-                      options: itemOptions
-                    })}
-                    ${renderTagList(
-                      ownedItems,
-                      getItemName,
-                      'Aún no hay objetos asignados.',
-                      'data-remove-character-item-id'
-                    )}
-                  </div>
-                </div>
-                <div class="field">
-                  <label>Líder de organizaciones</label>
-                  ${renderChipList(leadOrganizations, getOrganizationName, 'No lidera organizaciones.')}
-                </div>
               </div>
             `
             : `
@@ -1710,6 +1673,47 @@ function renderCharacterDetail(character) {
               <label for="characterPersonalityInput">Personalidad</label>
               <textarea id="characterPersonalityInput" class="character-textarea" placeholder="Rasgos de personalidad">${escapeHtml(character.personality || '')}</textarea>
             </div>
+
+            <div class="field full-width">
+              <label>Residencia</label>
+              <div class="character-select-stack">
+                ${renderWritableSelectMarkup({
+                  inputId: 'characterResidenceInput',
+                  panelId: 'characterResidencePanel',
+                  placeholder: 'Escribe una región...',
+                  options: regionOptions
+                })}
+                ${renderTagList(
+                  residenceRegions,
+                  getRegionName,
+                  'Aún no hay regiones de residencia.',
+                  'data-remove-character-residence-id'
+                )}
+              </div>
+            </div>
+
+            <div class="field full-width">
+              <label>Objetos</label>
+              <div class="character-select-stack">
+                ${renderWritableSelectMarkup({
+                  inputId: 'characterItemsInput',
+                  panelId: 'characterItemsPanel',
+                  placeholder: 'Escribe un objeto...',
+                  options: itemOptions
+                })}
+                ${renderTagList(
+                  ownedItems,
+                  getItemName,
+                  'Aún no hay objetos asignados.',
+                  'data-remove-character-item-id'
+                )}
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Líder de organizaciones</label>
+              ${renderChipList(leadOrganizations, getOrganizationName, 'No lidera organizaciones.')}
+            </div>
           </div>
         ` : `
           <div class="character-edit-section">
@@ -1717,6 +1721,9 @@ function renderCharacterDetail(character) {
             ${renderReadOnlyField('Descripción', character.description, 'Sin descripción.')}
             ${renderReadOnlyField('Motivaciones', character.motivations, 'Sin motivaciones.')}
             ${renderReadOnlyField('Personalidad', character.personality, 'Sin personalidad definida.')}
+            ${renderReadOnlyField('Residencia', residenceRegions.length ? residenceRegions.map((region) => getRegionName(region)).join(' · ') : '', 'Sin residencia.', 'full-width')}
+            ${renderReadOnlyField('Objetos', ownedItems.length ? ownedItems.map((item) => getItemName(item)).join(' · ') : '', 'Sin objetos.', 'full-width')}
+            ${renderReadOnlyField('Líder de organizaciones', leadOrganizations.length ? leadOrganizations.map((organization) => getOrganizationName(organization)).join(' · ') : '', 'No lidera organizaciones.')}
           </div>
         `}
       </section>
