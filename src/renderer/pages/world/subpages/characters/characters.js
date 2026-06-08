@@ -15,9 +15,10 @@ const CHARACTER_STATUS_LABELS = {
   dead: 'Fallecido'
 };
 
-const RELATION_TYPES = ['progenitor', 'hermano', 'familia', 'amigo', 'amante', 'rival'];
+const RELATION_TYPES = ['progenitor', 'descendiente', 'hermano', 'familia', 'amigo', 'amante', 'rival'];
 const RELATION_TYPE_LABELS = {
   progenitor: 'Progenitor',
+  descendiente: 'Descendiente',
   hermano: 'Hermano/a',
   familia: 'Familia',
   amigo: 'Amigo',
@@ -39,11 +40,20 @@ const deleteCharacterModal = document.getElementById('deleteCharacterModal');
 const deleteCharacterModalBody = document.getElementById('deleteCharacterModalBody');
 const deleteCharacterModalCancel = document.getElementById('deleteCharacterModalCancel');
 const deleteCharacterModalConfirm = document.getElementById('deleteCharacterModalConfirm');
+const relationModal = document.getElementById('relationModal');
+const relationModalTitle = document.getElementById('relationModalTitle');
+const relationModalBody = document.getElementById('relationModalBody');
+const relationModalCancel = document.getElementById('relationModalCancel');
+const relationModalConfirm = document.getElementById('relationModalConfirm');
+const relationModalDelete = document.getElementById('relationModalDelete');
 
 let worlds = [];
 let selectedCharacterId = null;
 let characterEditMode = false;
 let characterPendingDeleteId = null;
+let relationModalState = null;
+let relationComposerState = null;
+let collapsedRelationGroups = new Set();
 
 function loadWorlds() {
   try {
@@ -176,6 +186,13 @@ function getStatusLabel(status) {
 
 function getRelationLabel(type) {
   return RELATION_TYPE_LABELS[type] || RELATION_TYPE_LABELS.familia;
+}
+
+function getInverseRelationType(type) {
+  if (type === 'progenitor') return 'descendiente';
+  if (type === 'descendiente') return 'progenitor';
+  if (RELATION_TYPES.includes(type)) return type;
+  return 'familia';
 }
 
 function getCharacterDisplayName(character) {
@@ -404,6 +421,129 @@ function normalizeRelations(character, validCharacterIds) {
   return relations;
 }
 
+function getCharacterRelation(character, targetId) {
+  return toArray(character?.relations).find((relation) => relation.targetId === targetId) || null;
+}
+
+function syncBidirectionalRelations(world) {
+  const characters = getCharacters(world);
+  const characterById = new Map(characters.map((character) => [character.id, character]));
+  const pairMap = new Map();
+  let changed = false;
+
+  characters.forEach((character) => {
+    const currentRelations = Array.isArray(character.relations) ? character.relations : [];
+    const nextRelations = [];
+
+    currentRelations.forEach((relation) => {
+      const sourceId = character.id;
+      const targetId = String(relation.targetId || '').trim();
+      if (!targetId || targetId === sourceId || !characterById.has(targetId)) {
+        return;
+      }
+
+      const relationType = RELATION_TYPES.includes(relation.type) ? relation.type : 'familia';
+      const relationNote = String(relation.note || '').trim().slice(0, 200);
+      const normalizedRelation = {
+        id: relation.id || `relation-${sourceId}-${targetId}`,
+        targetId,
+        type: relationType,
+        note: relationNote,
+        createdAt: relation.createdAt || Date.now(),
+        updatedAt: relation.updatedAt || Date.now()
+      };
+      nextRelations.push(normalizedRelation);
+
+      const pairKey = [sourceId, targetId].sort().join('::');
+      const existingPair = pairMap.get(pairKey) || {
+        sourceId: [sourceId, targetId].sort()[0],
+        targetId: [sourceId, targetId].sort()[1],
+        relations: new Map()
+      };
+      existingPair.relations.set(sourceId, normalizedRelation);
+      pairMap.set(pairKey, existingPair);
+    });
+
+    const nextSignature = nextRelations
+      .map((relation) => [relation.targetId, relation.type, String(relation.note || '')].join('|'))
+      .sort();
+    const currentSignature = currentRelations
+      .map((relation) => [String(relation.targetId || ''), String(relation.type || ''), String(relation.note || '')].join('|'))
+      .sort();
+
+    if (!areEqualArrays(nextSignature, currentSignature)) {
+      changed = true;
+    }
+
+    character.relations = nextRelations;
+  });
+
+  pairMap.forEach((pair) => {
+    const firstId = pair.sourceId;
+    const secondId = pair.targetId;
+    const firstRelation = pair.relations.get(firstId) || null;
+    const secondRelation = pair.relations.get(secondId) || null;
+
+    const firstNote = String(firstRelation?.note || '').trim();
+    const secondNote = String(secondRelation?.note || '').trim();
+    let noteOwnerId = null;
+
+    if (firstNote && secondNote) {
+      noteOwnerId =
+        (Number(secondRelation?.updatedAt) || 0) > (Number(firstRelation?.updatedAt) || 0)
+          ? secondId
+          : firstId;
+    } else if (firstNote) {
+      noteOwnerId = firstId;
+    } else if (secondNote) {
+      noteOwnerId = secondId;
+    }
+
+    const buildRelation = (sourceId, targetId, sourceRelation, otherRelation) => {
+      const sourceCharacter = characterById.get(sourceId);
+      if (!sourceCharacter) return null;
+
+      const relationType = sourceRelation?.type || (otherRelation ? getInverseRelationType(otherRelation.type) : 'familia');
+      const normalizedType = RELATION_TYPES.includes(relationType) ? relationType : 'familia';
+      return {
+        id: sourceRelation?.id || `relation-${sourceId}-${targetId}`,
+        targetId,
+        type: normalizedType,
+        note: noteOwnerId === sourceId ? String(sourceRelation?.note || '').trim().slice(0, 200) : '',
+        createdAt: sourceRelation?.createdAt || otherRelation?.createdAt || Date.now(),
+        updatedAt: Date.now()
+      };
+    };
+
+    const firstNext = buildRelation(firstId, secondId, firstRelation, secondRelation);
+    const secondNext = buildRelation(secondId, firstId, secondRelation, firstRelation);
+    const firstCharacter = characterById.get(firstId);
+    const secondCharacter = characterById.get(secondId);
+
+    if (firstCharacter && firstNext) {
+      const currentRelation = getCharacterRelation(firstCharacter, secondId);
+      const nextSignature = [firstNext.targetId, firstNext.type, firstNext.note].join('|');
+      const currentSignature = currentRelation
+        ? [currentRelation.targetId, currentRelation.type, String(currentRelation.note || '')].join('|')
+        : '';
+      if (nextSignature !== currentSignature) changed = true;
+      firstCharacter.relations = toArray(firstCharacter.relations).filter((relation) => relation.targetId !== secondId).concat(firstNext);
+    }
+
+    if (secondCharacter && secondNext) {
+      const currentRelation = getCharacterRelation(secondCharacter, firstId);
+      const nextSignature = [secondNext.targetId, secondNext.type, secondNext.note].join('|');
+      const currentSignature = currentRelation
+        ? [currentRelation.targetId, currentRelation.type, String(currentRelation.note || '')].join('|')
+        : '';
+      if (nextSignature !== currentSignature) changed = true;
+      secondCharacter.relations = toArray(secondCharacter.relations).filter((relation) => relation.targetId !== firstId).concat(secondNext);
+    }
+  });
+
+  return changed;
+}
+
 function getRelationSignature(relation) {
   return [
     String(relation?.targetId || ''),
@@ -582,6 +722,8 @@ function normalizeWorldData(world) {
     changed = normalizeCharacter(character, index, regionIds, itemIds, characterIds) || changed;
   });
 
+  changed = syncBidirectionalRelations(world) || changed;
+
   world.organizations.forEach((organization, index) => {
     if (!organization.id) {
       organization.id = `organization-${Date.now()}-${index}`;
@@ -701,12 +843,18 @@ function removeCharacterListValue(character, field, value) {
 
 function toggleCharacterEditMode() {
   characterEditMode = !characterEditMode;
+  if (!characterEditMode) {
+    closeRelationComposer();
+  }
+  closeRelationModal();
   render();
 }
 
 function showCharacterList() {
   selectedCharacterId = null;
   characterEditMode = false;
+  closeRelationComposer();
+  closeRelationModal();
   setUrlCharacterId(null);
   render();
 }
@@ -714,6 +862,8 @@ function showCharacterList() {
 function openCharacterDetail(characterId) {
   selectedCharacterId = characterId;
   characterEditMode = false;
+  closeRelationComposer();
+  closeRelationModal();
   setUrlCharacterId(characterId);
   render();
 }
@@ -834,10 +984,219 @@ function addRelation(character, targetId, type, note) {
   render();
 }
 
+function updateRelation(character, targetId, updates) {
+  const world = getCurrentWorld();
+  if (!world || !character) return;
+
+  const targetCharacter = getCharacterById(world, targetId);
+  const currentRelations = toArray(character.relations);
+  const relationIndex = currentRelations.findIndex((relation) => relation.targetId === targetId);
+  if (relationIndex < 0) return;
+
+  const currentRelation = currentRelations[relationIndex];
+  const now = Date.now();
+  const nextType = RELATION_TYPES.includes(updates?.type) ? updates.type : currentRelation.type;
+  const nextNote = String(updates?.note ?? currentRelation.note ?? '').trim().slice(0, 200);
+
+  currentRelations[relationIndex] = {
+    ...currentRelation,
+    type: nextType,
+    note: nextNote,
+    updatedAt: now
+  };
+
+  character.relations = currentRelations;
+  character.updatedAt = now;
+
+  if (targetCharacter) {
+    const reverseRelations = toArray(targetCharacter.relations);
+    const reverseIndex = reverseRelations.findIndex((relation) => relation.targetId === character.id);
+    const inverseType = getInverseRelationType(nextType);
+
+    if (reverseIndex >= 0) {
+      reverseRelations[reverseIndex] = {
+        ...reverseRelations[reverseIndex],
+        type: inverseType,
+        note: '',
+        updatedAt: now
+      };
+    } else {
+      reverseRelations.push({
+        id: `relation-${targetCharacter.id}-${character.id}-${now}`,
+        targetId: character.id,
+        type: inverseType,
+        note: '',
+        createdAt: now,
+        updatedAt: now
+      });
+    }
+
+    targetCharacter.relations = reverseRelations;
+    targetCharacter.updatedAt = now;
+  }
+
+  world.updatedAt = now;
+  normalizeWorldData(world);
+  saveWorlds();
+
+  if (updates?.rerender !== false) {
+    render();
+  }
+}
+
 function removeRelation(character, targetId) {
-  const nextRelations = toArray(character.relations).filter((relation) => relation.targetId !== targetId);
-  setCharacterRelationFields(character, nextRelations);
+  const world = getCurrentWorld();
+  if (!world || !character) return;
+
+  const targetCharacter = getCharacterById(world, targetId);
+  const now = Date.now();
+  character.relations = toArray(character.relations).filter((relation) => relation.targetId !== targetId);
+  character.updatedAt = now;
+
+  if (targetCharacter) {
+    targetCharacter.relations = toArray(targetCharacter.relations).filter((relation) => relation.targetId !== character.id);
+    targetCharacter.updatedAt = now;
+  }
+
+  world.updatedAt = now;
+  normalizeWorldData(world);
+  saveWorlds();
+
   render();
+}
+
+function openCharacterFromRelation(targetId) {
+  if (!targetId) return;
+  openCharacterDetail(targetId);
+}
+
+function closeRelationComposer() {
+  relationComposerState = null;
+}
+
+function closeRelationModal() {
+  relationModalState = null;
+  relationModal?.classList.add('hidden');
+  relationModal?.setAttribute('aria-hidden', 'true');
+}
+
+function openRelationModal(character, targetId, mode = 'view') {
+  if (mode === 'edit') {
+    closeRelationModal();
+    relationComposerState = {
+      characterId: character.id,
+      targetId
+    };
+    renderCharacterDetail(character);
+    return;
+  }
+
+  const world = getCurrentWorld();
+  if (!world || !character || !targetId) return;
+
+  const targetCharacter = getCharacterById(world, targetId);
+  const relation = getCharacterRelation(character, targetId);
+  if (!targetCharacter || !relation) return;
+
+  relationModalState = { characterId: character.id, targetId, mode };
+  const targetName = getCharacterDisplayName(targetCharacter);
+  const relationType = relation.type;
+  const relationNote = String(relation.note || '').trim();
+  const relationTypeOptions = RELATION_TYPES
+    .map(
+      (type) => `
+        <option value="${type}" ${type === relationType ? 'selected' : ''}>${escapeHtml(getRelationLabel(type))}</option>
+      `
+    )
+    .join('');
+
+  if (relationModalTitle) {
+    relationModalTitle.textContent = mode === 'edit' ? `Editar relación con ${targetName}` : `Relación con ${targetName}`;
+  }
+
+  if (relationModalBody) {
+    relationModalBody.innerHTML =
+      mode === 'edit'
+        ? `
+          <div class="relation-modal-grid">
+            <div class="relation-modal-form">
+              <div class="field">
+                <label for="relationModalTypeSelect">Relación</label>
+                <select id="relationModalTypeSelect" class="character-relation-select">
+                  ${relationTypeOptions}
+                </select>
+              </div>
+              <div class="field">
+                <label for="relationModalNoteInput">Nota</label>
+                <textarea id="relationModalNoteInput" class="character-relation-notes" maxlength="200" placeholder="Texto guardado de la relación">${escapeHtml(relationNote)}</textarea>
+              </div>
+            </div>
+            <aside class="relation-modal-preview">
+              <div class="relation-modal-preview-label">Vista previa</div>
+              <strong>${escapeHtml(targetName)}</strong>
+              <small>${escapeHtml(getRelationLabel(relationType))}</small>
+              <div class="relation-modal-preview-note">${relationNote ? escapeHtml(relationNote) : 'Sin nota guardada.'}</div>
+            </aside>
+          </div>
+        `
+        : `
+          <div class="relation-modal-view">
+            <div class="relation-modal-view-main">
+              <strong>${escapeHtml(targetName)}</strong>
+              <span>${escapeHtml(getRelationLabel(relationType))}</span>
+              <div class="relation-modal-view-note">${relationNote ? escapeHtml(relationNote) : 'Sin nota guardada.'}</div>
+            </div>
+            <div class="relation-modal-view-actions">
+              <button type="button" class="secondary" data-open-character-id="${escapeHtml(targetId)}">Abrir personaje</button>
+            </div>
+          </div>
+        `;
+  }
+
+  if (relationModalConfirm) {
+    relationModalConfirm.textContent = mode === 'edit' ? 'Guardar' : 'Cerrar';
+    relationModalConfirm.classList.toggle('hidden', mode !== 'edit');
+  }
+  if (relationModalCancel) {
+    relationModalCancel.textContent = mode === 'edit' ? 'Cancelar' : 'Cerrar';
+  }
+  if (relationModalDelete) {
+    relationModalDelete.classList.toggle('hidden', mode !== 'edit');
+  }
+
+  relationModal?.classList.remove('hidden');
+  relationModal?.setAttribute('aria-hidden', 'false');
+}
+
+function saveOpenRelationModal() {
+  if (!relationModalState || relationModalState.mode !== 'edit') {
+    closeRelationModal();
+    return;
+  }
+
+  const world = getCurrentWorld();
+  if (!world) return;
+
+  const character = getCharacterById(world, relationModalState.characterId);
+  if (!character) return;
+
+  const typeSelect = document.getElementById('relationModalTypeSelect');
+  const noteInput = document.getElementById('relationModalNoteInput');
+  updateRelation(character, relationModalState.targetId, {
+    type: typeSelect?.value || 'familia',
+    note: noteInput?.value || ''
+  });
+  closeRelationModal();
+}
+
+function deleteOpenRelation() {
+  if (!relationModalState) return;
+  const world = getCurrentWorld();
+  if (!world) return;
+  const character = getCharacterById(world, relationModalState.characterId);
+  if (!character) return;
+  removeRelation(character, relationModalState.targetId);
+  closeRelationModal();
 }
 
 function getRelationSections(character) {
@@ -867,6 +1226,9 @@ function renderCharacterCard(character) {
 function renderCharacterLists() {
   const world = getCurrentWorld();
   if (!world || !principalCharacters || !majorCharacters || !minorCharacters) return;
+
+  characterListView?.classList.remove('hidden');
+  characterDetailView?.classList.add('hidden');
 
   const principal = getCharacterByType(world, 'principal');
   const major = getCharacterByType(world, 'major');
@@ -971,43 +1333,197 @@ function renderTagList(items, getLabel, emptyLabel, removeAttr) {
   `;
 }
 
+function renderRelationComposer(character, world) {
+  const editingRelation =
+    relationComposerState?.characterId === character.id
+      ? getCharacterRelation(character, relationComposerState.targetId)
+      : null;
+  const isEditing = Boolean(editingRelation);
+  const selectedTargetId = editingRelation?.targetId || '';
+  const selectedType = editingRelation?.type || 'familia';
+  const selectedNote = String(editingRelation?.note || '');
+  const availableCharacters = getCharacters(world).filter((otherCharacter) => otherCharacter.id !== character.id);
+  const progenitorCount = toArray(character.relations).filter((relation) => relation.type === 'progenitor').length;
+  const canUseProgenitor = isEditing && editingRelation?.type === 'progenitor' ? true : progenitorCount < 2;
+  const selectedTargetCharacter = selectedTargetId ? getCharacterById(world, selectedTargetId) : null;
+  const relationTargetLabel = selectedTargetCharacter ? getCharacterDisplayName(selectedTargetCharacter) : '';
+
+  return `
+    <div class="character-relation-composer ${isEditing ? 'character-relation-composer-editing' : ''}">
+      <div class="character-panel-title">
+        <h4>${escapeHtml(isEditing ? 'Editar relación' : 'Añadir relación')}</h4>
+        <span>${escapeHtml(isEditing && relationTargetLabel ? relationTargetLabel : 'Nueva')}</span>
+      </div>
+      <div class="character-relation-grid">
+        <div class="field">
+          <label for="relationTargetSelect">Personaje</label>
+          <select id="relationTargetSelect" class="character-relation-select">
+            <option value="">Selecciona un personaje</option>
+            ${availableCharacters
+              .map(
+                (otherCharacter) => `
+                  <option value="${escapeHtml(otherCharacter.id)}" ${selectedTargetId === otherCharacter.id ? 'selected' : ''}>
+                    ${escapeHtml(getCharacterDisplayName(otherCharacter))}
+                  </option>
+                `
+              )
+              .join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label for="relationTypeSelect">Relación</label>
+          <select id="relationTypeSelect" class="character-relation-select">
+            ${RELATION_TYPES.map(
+              (type) => `
+                <option
+                  value="${type}"
+                  ${selectedType === type ? 'selected' : ''}
+                  ${type === 'progenitor' && !canUseProgenitor ? 'disabled' : ''}
+                >
+                  ${escapeHtml(getRelationLabel(type))}
+                </option>
+              `
+            ).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label for="relationNoteInput">Nota</label>
+          <textarea id="relationNoteInput" class="character-relation-notes" maxlength="200" placeholder="Máximo 200 caracteres">${escapeHtml(selectedNote)}</textarea>
+        </div>
+        <div class="field character-relation-composer-actions">
+          <label>&nbsp;</label>
+          <div class="character-relation-composer-buttons">
+            <button id="addRelationButton" class="action-button" type="button">Añadir</button>
+            ${
+              isEditing
+                ? `
+                  <button id="deleteEditingRelationButton" class="danger-button" type="button">Eliminar</button>
+                  <button id="cancelRelationComposerButton" class="secondary" type="button">Cancelar</button>
+                `
+                : ''
+            }
+          </div>
+        </div>
+      </div>
+      <div id="relationComposerMessage" class="character-edit-help">
+        ${escapeHtml(isEditing && relationTargetLabel ? `Editando relación con ${relationTargetLabel}.` : 'Máximo 2 progenitores por personaje.')}
+      </div>
+    </div>
+  `;
+}
+
+function submitRelationComposer(character) {
+  const world = getCurrentWorld();
+  if (!world || !character) return;
+
+  const targetSelect = document.getElementById('relationTargetSelect');
+  const typeSelect = document.getElementById('relationTypeSelect');
+  const noteInput = document.getElementById('relationNoteInput');
+  const targetId = targetSelect?.value || '';
+  const relationType = typeSelect?.value || 'familia';
+  const relationNote = noteInput?.value || '';
+
+  const editingRelation =
+    relationComposerState?.characterId === character.id
+      ? getCharacterRelation(character, relationComposerState.targetId)
+      : null;
+
+  if (!targetId) {
+    const message = document.getElementById('relationComposerMessage');
+    if (message) message.textContent = 'Selecciona un personaje.';
+    return;
+  }
+
+  const currentProgenitors = toArray(character.relations).filter((relation) => relation.type === 'progenitor');
+  const editingTargetIsProgenitor = editingRelation?.type === 'progenitor';
+  const canUseProgenitor = editingTargetIsProgenitor || currentProgenitors.length < 2;
+  if (relationType === 'progenitor' && !canUseProgenitor) {
+    const message = document.getElementById('relationComposerMessage');
+    if (message) message.textContent = 'Máximo 2 progenitores por personaje.';
+    return;
+  }
+
+  if (editingRelation && relationComposerState?.targetId === targetId) {
+    updateRelation(character, targetId, { type: relationType, note: relationNote, rerender: false });
+    relationComposerState = null;
+    renderCharacterDetail(character);
+    return;
+  }
+
+  if (editingRelation) {
+    const originalTargetId = relationComposerState.targetId;
+    relationComposerState = null;
+    removeRelation(character, originalTargetId);
+    addRelation(character, targetId, relationType, relationNote);
+    return;
+  }
+
+  addRelation(character, targetId, relationType, relationNote);
+}
+
+function deleteRelationComposer(character) {
+  if (!relationComposerState || relationComposerState.characterId !== character.id) return;
+  const targetId = relationComposerState.targetId;
+  relationComposerState = null;
+  removeRelation(character, targetId);
+}
+
 function renderRelationCard(world, relation, editable, character) {
   const target = getCharacterById(world, relation.targetId);
   const targetLabel = target ? getCharacterDisplayName(target) : 'Personaje eliminado';
-  const targetSubtitle = target ? getCharacterSummary(target) : '';
+  const noteText = String(relation.note || '').trim();
+  const hasNote = noteText.length > 0;
 
   return `
-    <div class="character-relation-card">
+    <div class="character-relation-card" data-relation-target-id="${escapeHtml(relation.targetId)}">
       <div class="character-relation-card-header">
-        <div>
+        <button type="button" class="character-relation-name" data-open-related-character-id="${escapeHtml(relation.targetId)}">
           <strong>${escapeHtml(targetLabel)}</strong>
-          <small>${escapeHtml(getRelationLabel(relation.type))}${targetSubtitle ? ` · ${escapeHtml(targetSubtitle)}` : ''}</small>
-        </div>
+        </button>
         ${editable ? `
           <div class="character-relation-card-actions">
-            <button type="button" class="secondary" data-remove-relation-id="${escapeHtml(relation.targetId)}">Eliminar</button>
+            <button type="button" class="secondary" data-open-relation-edit-id="${escapeHtml(relation.targetId)}">Editar</button>
           </div>
-        ` : ''}
+        ` : `
+          <div class="character-relation-card-actions">
+            <button
+              type="button"
+              class="secondary"
+              data-view-relation-id="${escapeHtml(relation.targetId)}"
+              aria-label="Ver relación"
+              ${hasNote ? '' : 'disabled'}
+              title="${hasNote ? 'Ver texto de la relación' : 'Esta relación no tiene texto'}"
+            >👁</button>
+          </div>
+        `}
       </div>
-      ${String(relation.note || '').trim()
-        ? `<div class="character-relation-note">${escapeHtml(relation.note)}</div>`
-        : '<div class="character-relation-note character-relation-note-empty">Sin nota.</div>'}
     </div>
   `;
 }
 
 function renderRelationGroup(world, character, section, editable) {
   const relations = section.relations;
+  const collapsed = collapsedRelationGroups.has(section.type);
 
   return `
     <div class="character-relation-section">
-      <div class="character-panel-title">
-        <h4>${escapeHtml(section.label)}</h4>
-        <span>${relations.length}</span>
+      <div class="character-panel-title character-relation-section-header">
+        <button
+          type="button"
+          class="character-relation-section-toggle"
+          data-toggle-relation-group="${escapeHtml(section.type)}"
+          aria-expanded="${collapsed ? 'false' : 'true'}"
+        >
+          <h4>${escapeHtml(section.label)}</h4>
+          <span>${relations.length}</span>
+          <span class="character-relation-chevron" aria-hidden="true">${collapsed ? '▸' : '▾'}</span>
+        </button>
       </div>
       ${
         relations.length
-          ? `<div class="character-relation-group">${relations.map((relation) => renderRelationCard(world, relation, editable, character)).join('')}</div>`
+          ? collapsed
+            ? ''
+            : `<div class="character-relation-group">${relations.map((relation) => renderRelationCard(world, relation, editable, character)).join('')}</div>`
           : '<div class="character-relation-group-empty">Sin relaciones de este tipo.</div>'
       }
     </div>
@@ -1210,47 +1726,7 @@ function renderCharacterDetail(character) {
 
     <section class="character-relations-panel">
       <h3>Relaciones</h3>
-      ${
-        editable
-          ? `
-            <div class="character-relation-composer">
-              <div class="character-relation-grid">
-                <div class="field">
-                  <label for="relationTargetSelect">Personaje</label>
-                  <select id="relationTargetSelect" class="character-relation-select">
-                    <option value="">Selecciona un personaje</option>
-                    ${getCharacters(world)
-                      .filter((otherCharacter) => otherCharacter.id !== character.id)
-                      .map((otherCharacter) => `
-                        <option value="${escapeHtml(otherCharacter.id)}">${escapeHtml(getCharacterDisplayName(otherCharacter))}</option>
-                      `)
-                      .join('')}
-                  </select>
-                </div>
-                <div class="field">
-                  <label for="relationTypeSelect">Relación</label>
-                  <select id="relationTypeSelect" class="character-relation-select">
-                    ${RELATION_TYPES.map((type) => `
-                      <option value="${type}" ${type === 'familia' ? 'selected' : ''} ${type === 'progenitor' && toArray(character.relations).filter((relation) => relation.type === 'progenitor').length >= 2 ? 'disabled' : ''}>
-                        ${escapeHtml(getRelationLabel(type))}
-                      </option>
-                    `).join('')}
-                  </select>
-                </div>
-                <div class="field">
-                  <label for="relationNoteInput">Nota</label>
-                  <textarea id="relationNoteInput" class="character-relation-notes" maxlength="200" placeholder="Máximo 200 caracteres"></textarea>
-                </div>
-                <div class="field">
-                  <label>&nbsp;</label>
-                  <button id="addRelationButton" class="action-button" type="button">Añadir</button>
-                </div>
-              </div>
-              <div id="relationComposerMessage" class="character-edit-help">Máximo 2 progenitores por personaje.</div>
-            </div>
-          `
-          : ''
-      }
+      ${editable ? renderRelationComposer(character, world) : ''}
 
       ${relationSections.map((section) => renderRelationGroup(world, character, section, editable)).join('')}
     </section>
@@ -1352,14 +1828,7 @@ function renderCharacterDetail(character) {
     });
 
     document.getElementById('addRelationButton')?.addEventListener('click', () => {
-      const targetSelect = document.getElementById('relationTargetSelect');
-      const typeSelect = document.getElementById('relationTypeSelect');
-      const noteInput = document.getElementById('relationNoteInput');
-      const targetId = targetSelect?.value || '';
-      const relationType = typeSelect?.value || 'familia';
-      const relationNote = noteInput?.value || '';
-      addRelation(character, targetId, relationType, relationNote);
-      if (noteInput) noteInput.value = '';
+      submitRelationComposer(character);
     });
 
     document.getElementById('relationNoteInput')?.addEventListener('input', (event) => {
@@ -1370,12 +1839,54 @@ function renderCharacterDetail(character) {
       }
     });
 
-    characterDetailView.querySelectorAll('[data-remove-relation-id]').forEach((button) => {
-      button.addEventListener('click', () => {
-        removeRelation(character, button.dataset.removeRelationId);
-      });
+    document.getElementById('deleteEditingRelationButton')?.addEventListener('click', () => {
+      deleteRelationComposer(character);
     });
+
+    document.getElementById('cancelRelationComposerButton')?.addEventListener('click', () => {
+      closeRelationComposer();
+      renderCharacterDetail(character);
+    });
+
   }
+
+  characterDetailView.querySelectorAll('[data-open-related-character-id]').forEach((button) => {
+    button.addEventListener('click', () => {
+      openCharacterFromRelation(button.dataset.openRelatedCharacterId);
+    });
+  });
+
+  characterDetailView.querySelectorAll('[data-view-relation-id]').forEach((button) => {
+    button.addEventListener('click', () => {
+      openRelationModal(character, button.dataset.viewRelationId, 'view');
+    });
+  });
+
+  characterDetailView.querySelectorAll('[data-open-relation-edit-id]').forEach((button) => {
+    button.addEventListener('click', () => {
+      openRelationModal(character, button.dataset.openRelationEditId, 'edit');
+    });
+  });
+
+  characterDetailView.querySelectorAll('[data-toggle-relation-group]').forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      const type = event.currentTarget.dataset.toggleRelationGroup;
+      if (!type) return;
+      if (collapsedRelationGroups.has(type)) {
+        collapsedRelationGroups.delete(type);
+      } else {
+        collapsedRelationGroups.add(type);
+      }
+      renderCharacterDetail(character);
+    });
+  });
+
+  characterDetailView.querySelectorAll('[data-remove-relation-id]').forEach((button) => {
+    button.addEventListener('click', () => {
+      removeRelation(character, button.dataset.removeRelationId);
+    });
+  });
 }
 
 function render() {
@@ -1411,6 +1922,21 @@ window.addEventListener('DOMContentLoaded', () => {
     if (event.target === deleteCharacterModal) {
       closeDeleteCharacterModal();
     }
+  });
+
+  relationModalCancel?.addEventListener('click', closeRelationModal);
+  relationModalConfirm?.addEventListener('click', saveOpenRelationModal);
+  relationModalDelete?.addEventListener('click', deleteOpenRelation);
+  relationModal?.addEventListener('click', (event) => {
+    if (event.target === relationModal) {
+      closeRelationModal();
+    }
+  });
+  relationModalBody?.addEventListener('click', (event) => {
+    const targetButton = event.target.closest('[data-open-character-id]');
+    if (!targetButton) return;
+    closeRelationModal();
+    openCharacterDetail(targetButton.dataset.openCharacterId);
   });
 
   render();

@@ -64,6 +64,20 @@
     </div>
   </div>
 
+  <div id="relationModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card relation-modal-card" role="dialog" aria-modal="true" aria-labelledby="relationModalTitle">
+      <div class="modal-header">
+        <h3 id="relationModalTitle">Relación</h3>
+      </div>
+      <div class="modal-body" id="relationModalBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="danger-button hidden" id="relationModalDelete">Eliminar</button>
+        <button type="button" class="secondary" id="relationModalCancel">Cerrar</button>
+        <button type="button" class="action-button" id="relationModalConfirm">Guardar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="characters.js"></script>
 </body>
 </html>

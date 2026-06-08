@@ -101,7 +101,12 @@ function getRegionName(region) {
 }
 
 function getCharacterName(character) {
-  return getEntityName(character, 'Personaje sin nombre');
+  const firstName = String(character?.firstName || '').trim();
+  const lastName = String(character?.lastName || '').trim();
+  const secondLastName = String(character?.secondLastName || '').trim();
+  const combinedName = [firstName, lastName, secondLastName].filter(Boolean).join(' ').trim();
+  if (combinedName) return combinedName;
+  return String(character?.alias || character?.title || 'Personaje sin nombre').trim();
 }
 
 function toArray(value) {
@@ -462,31 +467,147 @@ function renderCheckList(options, emptyLabel, field) {
   `;
 }
 
+function renderMultiSelectTags(items, getLabel, emptyLabel, field) {
+  if (!items.length) {
+    return `<div class="organization-empty-text">${escapeHtml(emptyLabel)}</div>`;
+  }
+
+  return `
+    <div class="organization-selected-tags" data-multi-select-tags="${escapeHtml(field)}">
+      ${items
+        .map(
+          (item) => `
+            <span class="organization-tag" data-multi-select-id="${escapeHtml(item.id)}">
+              ${escapeHtml(getLabel(item))}
+              <button type="button" class="tag-remove" data-remove-multi-select-id="${escapeHtml(item.id)}">&times;</button>
+            </span>
+          `
+        )
+        .join('')}
+    </div>
+  `;
+}
+
+function renderMultiSelectField({ field, title, placeholder, emptyLabel, items, selectedIds, getLabel }) {
+  const inputId = `${field}-input`;
+  const panelId = `${field}-panel`;
+  const selectedSet = new Set(selectedIds);
+
+  return `
+    <div class="organization-edit-section">
+      <div class="organization-edit-heading">
+        <h4>${escapeHtml(title)}</h4>
+        <span>${selectedIds.length}</span>
+      </div>
+      <div class="organization-multiselect-wrapper">
+        <div class="writable-select-shell" data-organization-multi-select>
+          <input
+            id="${inputId}"
+            class="writable-select-input"
+            type="text"
+            autocomplete="off"
+            placeholder="${escapeHtml(placeholder)}"
+          />
+          <div id="${panelId}" class="writable-select-panel hidden" aria-hidden="true">
+            ${
+              items.length
+                ? items
+                    .map((item) => {
+                      const checked = selectedSet.has(item.id);
+                      return `
+                        <button
+                          type="button"
+                          class="writable-select-option"
+                          data-multi-select-option
+                          data-multi-select-field="${escapeHtml(field)}"
+                          data-item-id="${escapeHtml(item.id)}"
+                        >
+                          <span>${escapeHtml(getLabel(item))}</span>
+                          ${checked ? '<span class="check-mark">✓</span>' : ''}
+                        </button>
+                      `;
+                    })
+                    .join('')
+                : `<div class="writable-select-empty">${escapeHtml(emptyLabel)}</div>`
+            }
+          </div>
+        </div>
+        ${renderMultiSelectTags(
+          items.filter((item) => selectedSet.has(item.id)),
+          getLabel,
+          `Sin ${title.toLowerCase()}.`,
+          field
+        )}
+      </div>
+    </div>
+  `;
+}
+
 function renderRoleCheckList(characters, organization, roleField) {
   if (!characters.length) {
     return '<div class="organization-empty-text">No hay personajes.</div>';
   }
 
+  const selectedIds = toArray(organization[roleField]);
+  const fieldId = `organization-${roleField.replace('Ids', '')}`;
+  const inputId = `${fieldId}-input`;
+  const panelId = `${fieldId}-panel`;
+  
+  const options = characters.map((character) => ({
+    id: character.id,
+    label: getCharacterName(character),
+    checked: selectedIds.includes(character.id)
+  }));
+
   return `
-    <div class="organization-check-list">
-      ${characters
-        .map((character) => {
-          const checked = toArray(organization[roleField]).includes(character.id);
-          return `
-            <label class="organization-check-option">
-              <input
-                type="checkbox"
-                ${checked ? 'checked' : ''}
-                data-character-role="${escapeHtml(roleField)}"
-                data-character-id="${escapeHtml(character.id)}"
-              />
-              <span class="organization-check-copy">
-                <strong>${escapeHtml(getCharacterName(character))}</strong>
-              </span>
-            </label>
-          `;
-        })
-        .join('')}
+    <div class="organization-multiselect-wrapper">
+      <div class="writable-select-shell" data-writable-select>
+        <input
+          id="${inputId}"
+          class="writable-select-input"
+          type="text"
+          autocomplete="off"
+          placeholder="Buscar personaje..."
+        />
+        <div id="${panelId}" class="writable-select-panel hidden" aria-hidden="true">
+          ${
+            options.length
+              ? options
+                  .map(
+                    (option) => `
+                      <button
+                        type="button"
+                        class="writable-select-option"
+                        data-role-option="${escapeHtml(roleField)}"
+                        data-character-id="${escapeHtml(option.id)}"
+                      >
+                        <span>${escapeHtml(option.label)}</span>
+                        ${option.checked ? '<span class="check-mark">✓</span>' : ''}
+                      </button>
+                    `
+                  )
+                  .join('')
+              : '<div class="writable-select-empty">No hay personajes disponibles.</div>'
+          }
+        </div>
+      </div>
+      <div class="organization-selected-tags" data-role-tags="${escapeHtml(roleField)}">
+        ${
+          selectedIds.length
+            ? selectedIds
+                .map((id) => {
+                  const char = characters.find((c) => c.id === id);
+                  return char
+                    ? `<span class="organization-tag" data-character-id="${escapeHtml(id)}">
+                        ${escapeHtml(getCharacterName(char))}
+                        <button type="button" class="tag-remove" data-remove-character-id="${escapeHtml(id)}">&times;</button>
+                      </span>`
+                    : '';
+                })
+                .join('')
+            : '<div class="organization-empty-text">No hay personajes seleccionados.</div>'
+        }
+      </div>
     </div>
   `;
 }
@@ -603,37 +724,25 @@ function renderOrganizationDetail(organization) {
                 </div>
               </div>
 
-              <div class="organization-edit-section">
-                <div class="organization-edit-heading">
-                  <h4>Subsidiarios</h4>
-                  <span>${toArray(organization.subsidiaryIds).length}</span>
-                </div>
-                ${renderCheckList(
-                  allOrganizations.map((item) => ({
-                    id: item.id,
-                    label: getOrganizationName(item),
-                    checked: toArray(organization.subsidiaryIds).includes(item.id)
-                  })),
-                  'No hay subsidiarios disponibles.',
-                  'subsidiaryIds'
-                )}
-              </div>
+              ${renderMultiSelectField({
+                field: 'subsidiaryIds',
+                title: 'Subsidiarios',
+                placeholder: 'Buscar organización...',
+                emptyLabel: 'No hay subsidiarios disponibles.',
+                items: allOrganizations,
+                selectedIds: toArray(organization.subsidiaryIds),
+                getLabel: getOrganizationName
+              })}
 
-              <div class="organization-edit-section">
-                <div class="organization-edit-heading">
-                  <h4>Opera en</h4>
-                  <span>${toArray(organization.regionIds).length}</span>
-                </div>
-                ${renderCheckList(
-                  allRegions.map((region) => ({
-                    id: region.id,
-                    label: getRegionName(region),
-                    checked: toArray(organization.regionIds).includes(region.id)
-                  })),
-                  'No hay regiones creadas.',
-                  'regionIds'
-                )}
-              </div>
+              ${renderMultiSelectField({
+                field: 'regionIds',
+                title: 'Opera en',
+                placeholder: 'Buscar región...',
+                emptyLabel: 'No hay regiones creadas.',
+                items: allRegions,
+                selectedIds: toArray(organization.regionIds),
+                getLabel: getRegionName
+              })}
             `
             : `
               <dl class="organization-info-list">
@@ -716,26 +825,127 @@ function renderOrganizationDetail(organization) {
       updateOrganizationField(organization, 'notes', event.target.value);
     });
 
-    organizationDetailView.querySelectorAll('[data-toggle-list-field]').forEach((input) => {
-      input.addEventListener('change', (event) => {
-        setListMembership(
-          organization,
-          event.target.dataset.toggleListField,
-          event.target.dataset.itemId,
-          event.target.checked
-        );
+    organizationDetailView.querySelectorAll('[data-organization-multi-select]').forEach((shell) => {
+      const input = shell.querySelector('.writable-select-input');
+      const panel = shell.querySelector('.writable-select-panel');
+
+      if (!input || !panel) return;
+
+      const updatePanel = () => {
+        const searchTerm = String(input.value || '').trim().toLowerCase();
+        panel.querySelectorAll('[data-multi-select-option]').forEach((option) => {
+          const text = option.textContent.toLowerCase();
+          option.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+      };
+
+      input.addEventListener('focus', () => {
+        updatePanel();
+        panel.classList.remove('hidden');
+        panel.setAttribute('aria-hidden', 'false');
+      });
+
+      input.addEventListener('click', () => {
+        updatePanel();
+        panel.classList.remove('hidden');
+        panel.setAttribute('aria-hidden', 'false');
+      });
+
+      input.addEventListener('input', updatePanel);
+      input.addEventListener('blur', () => {
+        setTimeout(() => {
+          panel.classList.add('hidden');
+          panel.setAttribute('aria-hidden', 'true');
+          input.value = '';
+          panel.querySelectorAll('[data-multi-select-option]').forEach((option) => {
+            option.style.display = '';
+          });
+        }, 200);
+      });
+
+      panel.addEventListener('mousedown', (event) => {
+        event.preventDefault();
       });
     });
 
-    organizationDetailView.querySelectorAll('[data-character-role]').forEach((input) => {
-      input.addEventListener('change', (event) => {
-        setCharacterRole(
-          organization,
-          event.target.dataset.characterId,
-          event.target.dataset.characterRole,
-          event.target.checked
-        );
+    organizationDetailView.querySelectorAll('[data-multi-select-option]').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        const field = button.dataset.multiSelectField;
+        const itemId = button.dataset.itemId;
+        const isSelected = toArray(organization[field]).includes(itemId);
+        setListMembership(organization, field, itemId, !isSelected);
       });
+    });
+
+    organizationDetailView.querySelectorAll('[data-remove-multi-select-id]').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        const tags = button.closest('[data-multi-select-tags]');
+        if (!tags) return;
+        setListMembership(organization, tags.dataset.multiSelectTags, button.dataset.removeMultiSelectId, false);
+      });
+    });
+
+    // Handle role multiselect options
+    organizationDetailView.querySelectorAll('[data-role-option]').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        const roleField = button.dataset.roleOption;
+        const characterId = button.dataset.characterId;
+        const isSelected = toArray(organization[roleField]).includes(characterId);
+        setCharacterRole(organization, characterId, roleField, !isSelected);
+      });
+    });
+
+    // Handle role tag removal
+    organizationDetailView.querySelectorAll('[data-remove-character-id]').forEach((btn) => {
+      btn.addEventListener('click', (event) => {
+        event.preventDefault();
+        const characterId = btn.dataset.removeCharacterId;
+        const tagElement = btn.closest('[data-character-id]');
+        if (tagElement) {
+          const roleTagsElement = tagElement.closest('[data-role-tags]');
+          if (roleTagsElement) {
+            const roleField = roleTagsElement.dataset.roleTags;
+            setCharacterRole(organization, characterId, roleField, false);
+          }
+        }
+      });
+    });
+
+    // Setup writable selects for role inputs
+    organizationDetailView.querySelectorAll('[data-writable-select]').forEach((shell) => {
+      const input = shell.querySelector('.writable-select-input');
+      const panel = shell.querySelector('.writable-select-panel');
+      
+      if (input && panel) {
+        input.addEventListener('input', (event) => {
+          const searchTerm = event.target.value.toLowerCase();
+          const options = panel.querySelectorAll('[data-role-option]');
+          options.forEach((option) => {
+            const text = option.textContent.toLowerCase();
+            option.style.display = text.includes(searchTerm) ? '' : 'none';
+          });
+        });
+
+        input.addEventListener('focus', () => {
+          panel.classList.remove('hidden');
+          panel.setAttribute('aria-hidden', 'false');
+        });
+
+        input.addEventListener('blur', () => {
+          setTimeout(() => {
+            panel.classList.add('hidden');
+            panel.setAttribute('aria-hidden', 'true');
+            input.value = '';
+            const options = panel.querySelectorAll('[data-role-option]');
+            options.forEach((option) => {
+              option.style.display = '';
+            });
+          }, 200);
+        });
+      }
     });
   }
 }
