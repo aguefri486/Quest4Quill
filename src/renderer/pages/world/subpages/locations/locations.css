@@ -79,6 +79,10 @@
   resize: vertical;
 }
 
+.location-modal-card .modal-actions {
+  margin-top: 16px;
+}
+
 .modal-close {
   width: 38px;
   height: 38px;

@@ -111,6 +111,10 @@
   resize: vertical;
 }
 
+.note-modal-actions {
+  margin-top: 16px;
+}
+
 .note-modal-card select {
   width: 100%;
   min-height: 48px;
