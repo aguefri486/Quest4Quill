@@ -55,7 +55,7 @@ npm start
 - `npm run build:ts` compila solo TypeScript.
 - `npm run copy:assets` copia los archivos de interfaz a `dist/`.
 - `npm run build:dev` genera una build portable de prueba.
-- `npm run build` genera la build final para Windows.
+- `npm run build` genera el ejecutable de Windows en `dist/`.
 - `npm run pack` genera la aplicacion empaquetada en modo directorio.
 - `npm run dist` genera el instalador o paquete final.
 
@@ -94,3 +94,4 @@ Quest4Quill/
 - Los datos se guardan localmente en el entorno de Electron.
 - Si cambias HTML, CSS o JavaScript del renderer, recuerda que el contenido se copia a `dist/` en el flujo de arranque y build.
 - Si tocas el proceso principal, revisa la documentacion tecnica para mantener alineada la ventana y sus atajos.
+- El build de Windows actual no usa firmado de codigo, asi que Windows puede mostrar advertencias de seguridad al abrirlo por primera vez.

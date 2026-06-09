@@ -47,7 +47,13 @@ Genera una version portable para probar la aplicacion sin crear el instalador fi
 npm run build
 ```
 
-Genera el paquete final para Windows segun la configuracion del proyecto.
+Genera el ejecutable de Windows en `dist/`.
+
+La salida principal suele quedar en:
+- `dist/Quest4Quill 1.0.0.exe`
+- `dist/win-unpacked/Quest4Quill.exe`
+
+Este build no va firmado, asi que Windows puede mostrar una advertencia la primera vez que lo abras.
 
 ## Problemas frecuentes
 
