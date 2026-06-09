@@ -24,6 +24,17 @@ Desde aqui puedes:
 - crear un mundo nuevo
 - ver de un vistazo los proyectos que ya tienes
 
+### Importar y exportar mundos
+
+En la parte superior de la biblioteca tienes dos acciones rapidas:
+
+- `Importar mundos`: abre un selector para cargar uno o varios archivos JSON.
+- `Exportar todo`: descarga toda la biblioteca en un unico archivo JSON.
+
+Ademas, cada tarjeta de mundo incluye su propio boton de exportacion para sacar un mundo individual sin salir de la biblioteca.
+
+La importacion no borra tus mundos actuales. Si un archivo trae un identificador que ya existe, la app crea otro automaticamente para evitar conflictos.
+
 ### Crear un mundo
 
 1. Pulsa `Crear Nuevo Mundo`.

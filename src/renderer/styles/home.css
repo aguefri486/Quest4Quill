@@ -23,6 +23,35 @@
   font-size: 1.08rem;
 }
 
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.home-actions button {
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 999px;
+}
+
+.home-actions button.secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e6ddff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.home-actions button.secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.home-actions-note {
+  margin-top: 12px;
+  color: #a79ec6;
+  font-size: 0.95rem;
+}
+
 .worlds-section {
   display: flex;
   flex-direction: column;
@@ -81,8 +110,16 @@
   font-size: 0.94rem;
 }
 
-.world-delete-button {
+.world-card-actions {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.world-export-button,
+.world-delete-button {
   width: 34px;
   height: 34px;
   min-height: 34px;
@@ -108,6 +145,23 @@
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.world-export-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.world-export-button:hover {
+  background: rgba(110, 170, 255, 0.12);
+  border-color: rgba(110, 170, 255, 0.35);
+  color: #ffffff;
 }
 
 .world-delete-button:hover {
@@ -178,6 +232,14 @@
 }
 
 @media (max-width: 640px) {
+  .home-actions {
+    flex-direction: column;
+  }
+
+  .home-actions button {
+    width: 100%;
+  }
+
   .world-grid {
     grid-template-columns: 1fr;
   }

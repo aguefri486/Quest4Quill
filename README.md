@@ -64,6 +64,7 @@ npm start
 ## Funcionalidades destacadas
 
 - Biblioteca de mundos con creacion y apertura directa.
+- Importacion y exportacion de mundos individuales o de toda la biblioteca en JSON.
 - Vista principal de cada mundo con barra lateral de secciones.
 - Edicion de personajes con relacion entre personas, objetos y lugares.
 - Mapa de relaciones con zoom, desplazamiento, modo expandido y nodos arrastrables.
