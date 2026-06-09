@@ -9,19 +9,16 @@
   <link rel="stylesheet" href="relations.css">
 </head>
 <body class="tab-page">
-  <main class="tab-page-shell relations-workspace">
+  <main id="relationsWorkspace" class="tab-page-shell relations-workspace">
     <section class="page-header">
       <div>
         <p class="detail-kicker">Mapa</p>
         <h2 class="page-title" id="worldTitle">Relaciones</h2>
         <p class="page-copy">Explora las conexiones entre personajes y objetos en un grafo interactivo.</p>
       </div>
-      <div class="page-header-actions">
-        <button id="rebuildGraphButton" class="action-button" type="button">Reorganizar</button>
-      </div>
     </section>
 
-    <section class="relations-layout">
+    <section id="relationsLayout" class="relations-layout">
       <div class="relations-graph-panel">
         <div class="relations-graph-toolbar">
           <div class="relations-legend" aria-label="Leyenda del grafo">
@@ -52,16 +49,24 @@
           </div>
           <div class="relations-graph-meta">
             <span id="relationsStats" class="relations-stats">0 nodos</span>
+            <div class="relations-graph-controls" aria-label="Controles del grafo">
+              <button id="graphFullscreenButton" class="secondary relations-graph-control relations-graph-control-icon" type="button" aria-pressed="false" aria-label="Pantalla completa" title="Pantalla completa">⛶</button>
+              <button id="graphZoomOutButton" class="secondary relations-graph-control" type="button" aria-label="Alejar">-</button>
+              <button id="graphResetViewButton" class="secondary relations-graph-control relations-graph-control-wide" type="button">Vista original</button>
+              <button id="graphZoomInButton" class="secondary relations-graph-control" type="button" aria-label="Acercar">+</button>
+            </div>
           </div>
         </div>
 
         <div id="relationsGraphStage" class="relations-graph-stage">
-          <div id="relationsEmptyState" class="relations-empty-state hidden">
-            <strong>No hay nodos para mostrar.</strong>
-            <p>Necesitas personajes u objetos creados para que aparezca el mapa.</p>
+          <div id="relationsGraphViewport" class="relations-graph-viewport">
+            <div id="relationsEmptyState" class="relations-empty-state hidden">
+              <strong>No hay nodos para mostrar.</strong>
+              <p>Necesitas personajes u objetos creados para que aparezca el mapa.</p>
+            </div>
+            <svg id="relationsEdges" class="relations-edges" aria-hidden="true"></svg>
+            <div id="relationsNodeLayer" class="relations-node-layer" aria-label="Mapa de relaciones"></div>
           </div>
-          <svg id="relationsEdges" class="relations-edges" aria-hidden="true"></svg>
-          <div id="relationsNodeLayer" class="relations-node-layer" aria-label="Mapa de relaciones"></div>
         </div>
       </div>
 

@@ -13,6 +13,14 @@
   overflow: hidden;
 }
 
+.relations-workspace.is-fullscreen {
+  gap: 0;
+}
+
+.relations-workspace.is-fullscreen > .page-header {
+  display: none;
+}
+
 .relations-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
@@ -21,6 +29,18 @@
   min-height: 0;
   align-items: stretch;
   overflow: hidden;
+}
+
+.relations-layout.is-fullscreen {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.relations-layout.is-fullscreen .relations-details-panel {
+  display: none;
+}
+
+.relations-layout.is-fullscreen .relations-graph-panel {
+  grid-column: 1 / -1;
 }
 
 .relations-graph-panel,
@@ -35,6 +55,10 @@
   gap: 16px;
   min-height: 0;
   overflow: hidden;
+}
+
+.relations-layout.is-fullscreen .relations-graph-panel {
+  flex: 1;
 }
 
 .relations-details-panel {
@@ -112,11 +136,39 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .relations-stats {
   color: #bcb2df;
   font-size: 0.92rem;
+}
+
+.relations-graph-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.relations-graph-control {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+.relations-graph-control-icon {
+  width: 36px;
+  min-width: 36px;
+  padding: 0;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.relations-graph-control-wide {
+  min-width: 112px;
 }
 
 .relations-graph-stage {
@@ -131,6 +183,19 @@
     radial-gradient(circle at 50% 50%, rgba(142, 92, 255, 0.14), transparent 55%),
     radial-gradient(circle at 15% 15%, rgba(109, 62, 240, 0.12), transparent 40%),
     rgba(9, 5, 18, 0.86);
+  touch-action: none;
+  cursor: grab;
+}
+
+.relations-graph-stage.is-panning {
+  cursor: grabbing;
+}
+
+.relations-graph-viewport {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  will-change: transform;
 }
 
 .relations-edges {
@@ -252,6 +317,14 @@
   will-change: border-color, box-shadow, background-color;
 }
 
+.relation-node {
+  cursor: grab;
+}
+
+.relation-node:active {
+  cursor: grabbing;
+}
+
 .relation-node:hover:not(:disabled),
 .relation-node:focus-visible {
   transform: translate3d(-50%, -50%, 0);
@@ -294,16 +367,14 @@
 .relation-node-main {
   position: relative;
   z-index: 1;
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  word-break: break-word;
-}
-
   padding: 0 10px;
   font-size: 0.92rem;
   font-weight: 700;
   line-height: 1.12;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
   -webkit-line-clamp: 2;
 }
 

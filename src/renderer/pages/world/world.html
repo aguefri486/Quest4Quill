@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
   <link rel="stylesheet" href="../../styles/base.css">
   <link rel="stylesheet" href="../../styles/world.css">
 </head>
+
 <body>
   <div class="world-page">
     <aside class="world-sidebar">
@@ -16,7 +18,8 @@
             <p class="sidebar-kicker">MUNDO</p>
             <h1 id="worldName" class="world-sidebar-title">Mundo</h1>
           </div>
-          <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-expanded="true" aria-label="Plegar barra lateral">‹</button>
+          <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-expanded="true"
+            aria-label="Plegar barra lateral">‹</button>
         </div>
 
         <nav class="sidebar-nav" aria-label="Secciones del mundo">
@@ -24,13 +27,13 @@
             <p class="sidebar-group-label">GENERAL</p>
             <button class="sidebar-tab active" type="button" data-tab="stories">Historias</button>
             <button class="sidebar-tab" type="button" data-tab="notes">Notas</button>
+            <button class="sidebar-tab" type="button" data-tab="relations">Relaciones</button>
           </div>
 
           <div class="sidebar-group">
             <p class="sidebar-group-label">GENTE</p>
             <button class="sidebar-tab" type="button" data-tab="characters">Personajes</button>
             <button class="sidebar-tab" type="button" data-tab="organizations">Organizaciones</button>
-            <button class="sidebar-tab" type="button" data-tab="relations">Relaciones</button>
           </div>
 
           <div class="sidebar-group">
@@ -50,25 +53,16 @@
     </aside>
 
     <main class="world-content">
-      <button
-        id="sidebarCompactToggle"
-        class="sidebar-compact-toggle"
-        type="button"
-        aria-expanded="false"
-        aria-label="Plegar barra lateral"
-      >
+      <button id="sidebarCompactToggle" class="sidebar-compact-toggle" type="button" aria-expanded="false"
+        aria-label="Plegar barra lateral">
         ☰
       </button>
       <div id="sidebarBackdrop" class="sidebar-backdrop hidden" aria-hidden="true"></div>
-      <iframe
-        id="worldFrame"
-        class="world-frame"
-        title="Contenido del mundo"
-        src="about:blank"
-      ></iframe>
+      <iframe id="worldFrame" class="world-frame" title="Contenido del mundo" src="about:blank"></iframe>
     </main>
   </div>
 
   <script src="world.js"></script>
 </body>
+
 </html>
