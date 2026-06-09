@@ -6,6 +6,10 @@ app.commandLine.appendSwitch('disable-gpu');
 
 let mainWindow: BrowserWindow | null;
 
+function toggleFullscreen(window: BrowserWindow) {
+  window.setFullScreen(!window.isFullScreen());
+}
+
 const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -20,6 +24,15 @@ const createWindow = () => {
   const startUrl = `file://${path.join(__dirname, '../../renderer/pages/home/index.html')}`;
 
   mainWindow.loadURL(startUrl);
+
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.type !== 'keyDown' || input.key !== 'F11') return;
+
+    event.preventDefault();
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      toggleFullscreen(mainWindow);
+    }
+  });
 
   Menu.setApplicationMenu(null);
 

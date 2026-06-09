@@ -1,130 +1,96 @@
 # Quest4Quill
 
-Una aplicación de escritura moderna construida con Electron y TypeScript.
+Quest4Quill es una aplicacion de escritorio con Electron para construir y organizar mundos narrativos. La app centraliza personajes, relaciones, historias, notas, lugares, organizaciones y objetos en una sola biblioteca local.
 
-## 🚀 Primeros Pasos
+## Documentacion
 
-### Requisitos
-- Node.js 20+ (instalado automáticamente)
+- [Manual de Usuario](docs/Manual%20de%20Usuario.md)
+- [Guia de Instalacion](docs/Guia%20de%20Instalacion.md)
+- [Documentacion Tecnica](docs/Documentacion%20Tecnica.md)
+
+## Resumen
+
+La aplicacion se organiza en dos niveles:
+
+1. Una biblioteca inicial donde se crean y abren mundos.
+2. Una vista de mundo con secciones especializadas cargadas dentro de un `iframe`.
+
+Dentro de cada mundo puedes trabajar con:
+- historias
+- notas
+- relaciones
+- personajes
+- organizaciones
+- regiones
+- ubicaciones
+- objetos
+
+## Inicio rapido
+
+Requisitos:
+- Node.js 20 o superior
 - npm
 
-### Instalación
+Instalacion:
 
 ```bash
 npm install
 ```
 
-### Ejecutar la Aplicación
+Ejecucion en desarrollo:
 
-**Modo desarrollo (lo más fácil):**
 ```bash
 npm start
 ```
 
-Esto compilará el código TypeScript y lanzará la aplicación automáticamente.
+## Atajos y comportamiento de ventana
 
-### Tareas Disponibles en VS Code
+- `F11` alterna la aplicacion entre ventana normal y pantalla completa borderless.
+- `Esc` sale de algunos modos expansivos dentro de la interfaz, como la vista ampliada de Relaciones.
+- La barra lateral de un mundo puede plegarse para ganar espacio de trabajo.
 
-En VS Code, puedes usar las tareas predefinidas (Ctrl+Shift+B o Terminal > Run Task):
-- **Start Electron App (dev)** - Ejecuta la app en modo desarrollo (tarea predeterminada)
-- **Compile TypeScript** - Solo compila los archivos TypeScript
-- **Build Executable (Windows)** - Crea el ejecutable final (.exe)
-- **Build Executable (Dev Mode)** - Build rápido sin empaquetamiento
+## Scripts utiles
 
-## 🎯 Crear el Ejecutable
+- `npm start` compila TypeScript, copia los recursos del renderer y abre Electron.
+- `npm run build:ts` compila solo TypeScript.
+- `npm run copy:assets` copia los archivos de interfaz a `dist/`.
+- `npm run build:dev` genera una build portable de prueba.
+- `npm run build` genera la build final para Windows.
+- `npm run pack` genera la aplicacion empaquetada en modo directorio.
+- `npm run dist` genera el instalador o paquete final.
 
-### Build Rápido (Desarrollo):
-```bash
-npm run build:dev
-```
-Genera el ejecutable portable sin optimizaciones. Útil para testear.
+## Funcionalidades destacadas
 
-### Build Final (Producción):
-```bash
-npm run build
-```
-Crea el instalador oficial (.exe) completamente empaquetado.
+- Biblioteca de mundos con creacion y apertura directa.
+- Vista principal de cada mundo con barra lateral de secciones.
+- Edicion de personajes con relacion entre personas, objetos y lugares.
+- Mapa de relaciones con zoom, desplazamiento, modo expandido y nodos arrastrables.
+- Guardado local de la informacion para seguir trabajando entre sesiones.
 
-**Los ejecutables se generan en la carpeta `dist/`**
+## Estructura general
 
-## 📁 Estructura del Proyecto
-
-```
+```text
 Quest4Quill/
-├── src/
-│   ├── main/           # Proceso principal (Electron)
-│   │   └── index.ts
-│   ├── preload/        # Script de preload (seguridad)
-│   │   └── index.ts
-│   └── renderer/       # Interfaz de usuario
-│       ├── index.html
-│       ├── style.css
-│       └── app.js
-├── dist/               # Código compilado
-├── .vscode/
-│   └── tasks.json      # Tareas de VS Code
-├── package.json        # Dependencias y scripts
-├── tsconfig.json       # Configuración TypeScript
-└── README.md
+|-- src/
+|   |-- main/        Proceso principal de Electron
+|   |-- preload/     Puente de seguridad entre procesos
+|   `-- renderer/    Interfaz de usuario
+|-- dist/            Salida compilada
+|-- docs/            Documentacion del proyecto
+|-- package.json
+|-- README.md
+`-- tsconfig.json
 ```
 
-## ✨ Características Actuales
+## Flujo de trabajo recomendado
 
-- ✏️ Editor de texto simple y funcional
-- 📊 Contador automático de palabras y caracteres
-- 💾 Guardado automático en localStorage
-- 🎨 Interfaz moderna con gradientes
-- 🌙 DevTools abierto automáticamente en desarrollo
-- 📱 Diseño responsive
+1. Ejecuta `npm install` una sola vez.
+2. Usa `npm start` mientras desarrollas.
+3. Revisa el manual de usuario si quieres repasar la experiencia completa.
+4. Consulta la documentacion tecnica si vas a tocar la arquitectura o el renderer.
 
-## 📦 Scripts npm
+## Notas de desarrollo
 
-- `npm start` - Ejecuta la app (compila + lanza Electron)
-- `npm run build:ts` - Compila TypeScript a JavaScript
-- `npm run copy:assets` - Copia archivos estáticos (HTML, CSS)
-- `npm run build:dev` - Crea executable rápido
-- `npm run build` - Crea executable final
-
-## 🔧 Configuración
-
-### Cambiar Información de la App
-
-Edita `package.json`:
-- `"productName"` - Nombre visible de la aplicación
-- `"version"` - Versión de la app
-- `"appId"` en build - ID único para Windows
-
-### Cambiar Dimensiones de la Ventana
-
-Edita `src/main/index.ts` en `createWindow()`:
-```typescript
-mainWindow = new BrowserWindow({
-  width: 1200,  // Ancho
-  height: 800,  // Alto
-  // ...
-});
-```
-
-## 🐛 Troubleshooting
-
-### "ERR_FILE_NOT_FOUND" al ejecutar
-Ejecuta: `npm run copy:assets` para copiar archivos HTML/CSS
-
-### npm no está disponible
-Instala Node.js desde https://nodejs.org/
-
-### Errores de GPU en la consola
-Son normales en Electron. No afectan el funcionamiento de la app.
-
-## 📝 Próximos Pasos
-
-- [ ] Añadir exportación a archivos (.txt, .pdf)
-- [ ] Historial de cambios
-- [ ] Temas personalizables
-- [ ] Sincronización en la nube
-- [ ] Build para macOS
-- [ ] Build para Linux
-
----
-
-**¡Lista para desarrollar!** Abre el proyecto en VS Code y comienza a escribir. 🎉
+- Los datos se guardan localmente en el entorno de Electron.
+- Si cambias HTML, CSS o JavaScript del renderer, recuerda que el contenido se copia a `dist/` en el flujo de arranque y build.
+- Si tocas el proceso principal, revisa la documentacion tecnica para mantener alineada la ventana y sus atajos.
