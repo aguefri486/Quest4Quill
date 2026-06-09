@@ -682,6 +682,56 @@ function normalizeCharacter(character, index, validRegionIds, validItemIds, vali
   return changed;
 }
 
+function syncItemHoldings(world) {
+  const characters = getCharacters(world);
+  const items = getItems(world);
+  const characterById = new Map(characters.map((character) => [character.id, character]));
+  const itemById = new Map(items.map((item) => [item.id, item]));
+  let changed = false;
+
+  characters.forEach((character) => {
+    const nextItemIds = toArray(character.itemIds).filter((itemId) => itemById.has(itemId));
+    if (!areEqualArrays(nextItemIds, character.itemIds)) {
+      character.itemIds = nextItemIds;
+      changed = true;
+    }
+  });
+
+  items.forEach((item) => {
+    const explicitHolderId = characterById.has(String(item.holderId || '')) ? String(item.holderId) : null;
+    const inferredHolderId =
+      explicitHolderId ||
+      characters.find((character) => toArray(character.itemIds).includes(item.id))?.id ||
+      null;
+
+    if (item.holderId !== inferredHolderId) {
+      item.holderId = inferredHolderId;
+      changed = true;
+    }
+
+    if (!inferredHolderId) return;
+
+    const holderCharacter = characterById.get(inferredHolderId);
+    if (!holderCharacter) return;
+
+    const holderItems = toArray(holderCharacter.itemIds);
+    if (!holderItems.includes(item.id)) {
+      holderCharacter.itemIds = [...holderItems, item.id];
+      changed = true;
+    }
+
+    characters.forEach((otherCharacter) => {
+      if (otherCharacter.id === holderCharacter.id) return;
+      const otherItems = toArray(otherCharacter.itemIds);
+      if (!otherItems.includes(item.id)) return;
+      otherCharacter.itemIds = otherItems.filter((itemId) => itemId !== item.id);
+      changed = true;
+    });
+  });
+
+  return changed;
+}
+
 function normalizeWorldData(world) {
   let changed = false;
 
@@ -722,6 +772,7 @@ function normalizeWorldData(world) {
     changed = normalizeCharacter(character, index, regionIds, itemIds, characterIds) || changed;
   });
 
+  changed = syncItemHoldings(world) || changed;
   changed = syncBidirectionalRelations(world) || changed;
 
   world.organizations.forEach((organization, index) => {
@@ -1641,9 +1692,6 @@ function renderCharacterDetail(character) {
                 ${renderReadOnlyField('Género', character.gender)}
                 ${renderReadOnlyField('Edad', character.age === null || character.age === undefined ? '' : String(character.age), 'Sin edad.')}
                 ${renderReadOnlyField('Lugar de nacimiento', birthRegion ? getRegionName(birthRegion) : '', 'Sin lugar de nacimiento.')}
-                ${renderReadOnlyField('Residencia', residenceRegions.length ? residenceRegions.map((region) => getRegionName(region)).join(' · ') : '', 'Sin residencia.', 'full-width')}
-                ${renderReadOnlyField('Objetos', ownedItems.length ? ownedItems.map((item) => getItemName(item)).join(' · ') : '', 'Sin objetos.', 'full-width')}
-                ${renderReadOnlyField('Líder de organizaciones', leadOrganizations.length ? leadOrganizations.map((organization) => getOrganizationName(organization)).join(' · ') : '', 'No lidera organizaciones.')}
               </div>
             `
         }
@@ -1673,6 +1721,8 @@ function renderCharacterDetail(character) {
               <label for="characterPersonalityInput">Personalidad</label>
               <textarea id="characterPersonalityInput" class="character-textarea" placeholder="Rasgos de personalidad">${escapeHtml(character.personality || '')}</textarea>
             </div>
+
+            <div class="character-divider" aria-hidden="true"></div>
 
             <div class="field full-width">
               <label>Residencia</label>
@@ -1721,6 +1771,9 @@ function renderCharacterDetail(character) {
             ${renderReadOnlyField('Descripción', character.description, 'Sin descripción.')}
             ${renderReadOnlyField('Motivaciones', character.motivations, 'Sin motivaciones.')}
             ${renderReadOnlyField('Personalidad', character.personality, 'Sin personalidad definida.')}
+
+            <div class="character-divider" aria-hidden="true"></div>
+
             ${renderReadOnlyField('Residencia', residenceRegions.length ? residenceRegions.map((region) => getRegionName(region)).join(' · ') : '', 'Sin residencia.', 'full-width')}
             ${renderReadOnlyField('Objetos', ownedItems.length ? ownedItems.map((item) => getItemName(item)).join(' · ') : '', 'Sin objetos.', 'full-width')}
             ${renderReadOnlyField('Líder de organizaciones', leadOrganizations.length ? leadOrganizations.map((organization) => getOrganizationName(organization)).join(' · ') : '', 'No lidera organizaciones.')}

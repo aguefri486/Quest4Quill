@@ -6,6 +6,7 @@ const tabRoutes = {
   notes: 'subpages/notes/index.html',
   characters: 'subpages/characters/index.html',
   organizations: 'subpages/organizations/index.html',
+  relations: 'subpages/relations/index.html',
   regions: 'subpages/regions/index.html',
   locations: 'subpages/locations/index.html',
   items: 'subpages/items/index.html'
@@ -72,6 +73,14 @@ function setActiveTab(tabId) {
   if (worldFrame) {
     worldFrame.src = buildFrameUrl(tabId);
   }
+
+  const url = new URL(window.location.href);
+  if (tabId && tabRoutes[tabId]) {
+    url.searchParams.set('tab', tabId);
+  } else {
+    url.searchParams.delete('tab');
+  }
+  window.history.replaceState({}, '', url);
 }
 
 function applySidebarState() {

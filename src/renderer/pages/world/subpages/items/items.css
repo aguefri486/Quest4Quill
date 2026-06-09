@@ -1,0 +1,226 @@
+.items-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.item-list-view,
+.item-detail-view {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  flex: 1;
+  min-height: 0;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.items-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.items-grid .empty-state {
+  grid-column: 1 / -1;
+}
+
+.item-card,
+.create-item-card {
+  width: 100%;
+  min-height: 104px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: rgba(24, 12, 42, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  text-align: left;
+  color: #e8e3ff;
+}
+
+.item-card {
+  position: relative;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.item-card:hover,
+.create-item-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(160, 120, 255, 0.35);
+  background: rgba(32, 15, 54, 0.98);
+}
+
+.item-card-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item-card-copy strong {
+  color: #fff;
+  font-size: 1.08rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-card-copy span,
+.item-card-copy small {
+  color: #bcb2df;
+  font-size: 0.94rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.create-item-card {
+  background: linear-gradient(180deg, rgba(18, 18, 22, 0.96), rgba(12, 12, 15, 0.98));
+  border: 2px dashed rgba(140, 140, 150, 0.35);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.create-item-card span {
+  color: #a8a8b1;
+}
+
+.create-item-card strong {
+  color: #fff;
+}
+
+.create-item-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  border: 2px dashed rgba(140, 140, 150, 0.35);
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.02);
+  color: #d8d8df;
+  font-size: 1.6rem;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.item-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.item-detail-title {
+  min-width: 0;
+}
+
+.item-detail-title h2 {
+  margin-top: 10px;
+}
+
+.item-detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.item-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 18px;
+  min-height: 0;
+}
+
+.item-about-panel,
+.item-info-panel {
+  min-width: 0;
+  padding: 22px;
+  border-radius: 22px;
+  background: rgba(12, 6, 24, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.item-about-panel h3,
+.item-info-panel h3 {
+  color: #f3efff;
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+}
+
+.item-about-text {
+  color: #d9cffc;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.item-empty-text {
+  color: #8f84c8;
+  line-height: 1.7;
+}
+
+.item-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.item-info-list div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.item-info-list dt {
+  color: #8f84c8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.item-info-list dd {
+  color: #efeaff;
+  line-height: 1.5;
+}
+
+.item-edit-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .item-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .item-detail-header {
+    flex-direction: column;
+  }
+
+  .item-detail-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 720px) {
+  .items-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}

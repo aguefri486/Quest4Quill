@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relaciones</title>
+  <link rel="stylesheet" href="../../../../styles/base.css">
+  <link rel="stylesheet" href="../shared.css">
+  <link rel="stylesheet" href="relations.css">
+</head>
+<body class="tab-page">
+  <main class="tab-page-shell relations-workspace">
+    <section class="page-header">
+      <div>
+        <p class="detail-kicker">Mapa</p>
+        <h2 class="page-title" id="worldTitle">Relaciones</h2>
+        <p class="page-copy">Explora las conexiones entre personajes y objetos en un grafo interactivo.</p>
+      </div>
+      <div class="page-header-actions">
+        <button id="rebuildGraphButton" class="action-button" type="button">Reorganizar</button>
+      </div>
+    </section>
+
+    <section class="relations-layout">
+      <div class="relations-graph-panel">
+        <div class="relations-graph-toolbar">
+          <div class="relations-legend" aria-label="Leyenda del grafo">
+            <span class="relations-legend-item">
+              <span class="relations-legend-node relations-legend-character" aria-hidden="true"></span>
+              Personaje
+            </span>
+            <span class="relations-legend-item">
+              <span class="relations-legend-node relations-legend-item-node" aria-hidden="true"></span>
+              Objeto
+            </span>
+            <span class="relations-legend-item">
+              <span class="relations-legend-line relation-edge-type-progenitor" aria-hidden="true"></span>
+              Progenitor
+            </span>
+            <span class="relations-legend-item">
+              <span class="relations-legend-line relation-edge-type-amigo" aria-hidden="true"></span>
+              Amigo
+            </span>
+            <span class="relations-legend-item">
+              <span class="relations-legend-line relation-edge-type-familia" aria-hidden="true"></span>
+              Familia
+            </span>
+            <span class="relations-legend-item">
+              <span class="relations-legend-line relation-edge-type-rival" aria-hidden="true"></span>
+              Rival
+            </span>
+          </div>
+          <div class="relations-graph-meta">
+            <span id="relationsStats" class="relations-stats">0 nodos</span>
+          </div>
+        </div>
+
+        <div id="relationsGraphStage" class="relations-graph-stage">
+          <div id="relationsEmptyState" class="relations-empty-state hidden">
+            <strong>No hay nodos para mostrar.</strong>
+            <p>Necesitas personajes u objetos creados para que aparezca el mapa.</p>
+          </div>
+          <svg id="relationsEdges" class="relations-edges" aria-hidden="true"></svg>
+          <div id="relationsNodeLayer" class="relations-node-layer" aria-label="Mapa de relaciones"></div>
+        </div>
+      </div>
+
+      <aside class="relations-details-panel">
+        <div class="relations-details-header">
+          <h3>Detalle</h3>
+          <span id="relationsDetailsCount">Selecciona un nodo</span>
+        </div>
+        <div id="relationsDetails" class="relations-details-body"></div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="relations.js"></script>
+</body>
+</html>

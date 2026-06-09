@@ -6,18 +6,40 @@
   <title>Objetos</title>
   <link rel="stylesheet" href="../../../../styles/base.css">
   <link rel="stylesheet" href="../shared.css">
+  <link rel="stylesheet" href="items.css">
 </head>
 <body class="tab-page">
-  <main class="tab-page-shell">
-    <div>
-      <p class="detail-kicker">Objetos</p>
-      <h2 class="page-title">Objetos</h2>
-      <p class="page-copy">La colección de objetos tendrá su propia página dedicada.</p>
-    </div>
-    <div class="empty-state">
-      <strong>Próximamente</strong>
-      <p>Ya está separada para que la interfaz no crezca demasiado en un solo archivo.</p>
-    </div>
+  <main class="tab-page-shell items-workspace">
+    <section id="itemListView" class="item-list-view">
+      <div class="page-header">
+        <div>
+          <p class="detail-kicker">Objetos</p>
+          <h2 class="page-title" id="worldTitle">Objetos</h2>
+        </div>
+        <div class="page-header-actions">
+          <button id="createItemButton" class="action-button" type="button">Añadir objeto</button>
+        </div>
+      </div>
+
+      <div id="itemsGrid" class="items-grid" aria-label="Lista de objetos"></div>
+    </section>
+
+    <section id="itemDetailView" class="item-detail-view hidden" aria-live="polite"></section>
   </main>
+
+  <div id="deleteItemModal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="deleteItemModalTitle">
+      <div class="modal-header">
+        <h3 id="deleteItemModalTitle">Eliminar objeto</h3>
+      </div>
+      <div class="modal-body" id="deleteItemModalBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="secondary" id="deleteItemModalCancel">Cancelar</button>
+        <button type="button" class="danger-button" id="deleteItemModalConfirm">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="items.js"></script>
 </body>
 </html>

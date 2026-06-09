@@ -1,0 +1,493 @@
+.tab-page {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.relations-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.relations-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  gap: 18px;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.relations-graph-panel,
+.relations-details-panel {
+  min-width: 0;
+  padding: 22px;
+  border-radius: 22px;
+  background: rgba(12, 6, 24, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.relations-details-panel {
+  overflow: hidden;
+}
+
+.relations-graph-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.relations-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+}
+
+.relations-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #c9bffc;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.relations-legend-node,
+.relations-legend-line {
+  flex: 0 0 auto;
+}
+
+.relations-legend-node {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.relations-legend-character {
+  border-radius: 50%;
+  color: #8e5cff;
+}
+
+.relations-legend-item-node {
+  border-radius: 4px;
+  color: #5fb3ff;
+}
+
+.relations-legend-line {
+  width: 20px;
+  height: 0;
+  border-top: 2px solid currentColor;
+}
+
+.relation-edge-type-progenitor {
+  color: #f0b86d;
+}
+
+.relation-edge-type-amigo {
+  color: #74d49b;
+}
+
+.relation-edge-type-familia {
+  color: #b7a9ff;
+}
+
+.relation-edge-type-rival {
+  color: #ff7d7d;
+}
+
+.relations-graph-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.relations-stats {
+  color: #bcb2df;
+  font-size: 0.92rem;
+}
+
+.relations-graph-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(142, 92, 255, 0.14), transparent 55%),
+    radial-gradient(circle at 15% 15%, rgba(109, 62, 240, 0.12), transparent 40%),
+    rgba(9, 5, 18, 0.86);
+}
+
+.relations-edges {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.relations-node-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.relations-empty-state {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 28px;
+  z-index: 3;
+  color: #c9bffc;
+}
+
+.relations-empty-state strong {
+  display: block;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.relations-empty-state p {
+  max-width: 360px;
+  line-height: 1.6;
+}
+
+.relation-edge {
+  fill: none;
+  stroke-linecap: round;
+  opacity: 0.68;
+  transition: opacity 0.16s ease, stroke-width 0.16s ease, filter 0.16s ease;
+}
+
+.relation-edge.is-muted {
+  opacity: 0.14;
+}
+
+.relation-edge.is-active {
+  opacity: 1;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.12));
+}
+
+.relation-edge-type-progenitor,
+.relation-edge-type-descendiente {
+  stroke: #f0b86d;
+  stroke-width: 2.8;
+}
+
+.relation-edge-type-hermano {
+  stroke: #8bc6ff;
+  stroke-dasharray: 10 7;
+  stroke-width: 2.4;
+}
+
+.relation-edge-type-familia {
+  stroke: #b7a9ff;
+  stroke-dasharray: 2 9;
+  stroke-width: 2.2;
+}
+
+.relation-edge-type-amigo {
+  stroke: #74d49b;
+  stroke-dasharray: 7 6;
+  stroke-width: 2.4;
+}
+
+.relation-edge-type-amante {
+  stroke: #f28ac4;
+  stroke-width: 2.6;
+}
+
+.relation-edge-type-rival {
+  stroke: #ff7d7d;
+  stroke-dasharray: 13 6;
+  stroke-width: 2.4;
+}
+
+.relation-edge-type-holder {
+  stroke: rgba(214, 207, 248, 0.74);
+  stroke-dasharray: 4 8;
+  stroke-width: 1.9;
+}
+
+.relation-node {
+  position: absolute;
+  transform: translate3d(-50%, -50%, 0);
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  text-align: center;
+  color: #f4f0ff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+  background: rgba(21, 15, 32, 0.96);
+  cursor: pointer;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease, background-color 0.16s ease;
+  overflow: hidden;
+  user-select: none;
+  will-change: border-color, box-shadow, background-color;
+}
+
+.relation-node:hover:not(:disabled),
+.relation-node:focus-visible {
+  transform: translate3d(-50%, -50%, 0);
+  filter: none;
+}
+
+.relation-node:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22);
+}
+
+.relation-node::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 46%);
+  opacity: 0.6;
+  pointer-events: none;
+  transition: opacity 0.16s ease;
+}
+
+.relation-node:hover::before {
+  opacity: 0.82;
+}
+
+.relation-node-character {
+  width: 124px;
+  height: 124px;
+  border-radius: 50%;
+  background: rgba(21, 15, 32, 0.96);
+}
+
+.relation-node-item {
+  width: 94px;
+  height: 94px;
+  border-radius: 12px;
+  background: rgba(21, 15, 32, 0.96);
+}
+
+.relation-node-main {
+  position: relative;
+  z-index: 1;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+
+  padding: 0 10px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.12;
+  -webkit-line-clamp: 2;
+}
+
+.relation-node.is-selected {
+  border-color: rgba(255, 255, 255, 0.42);
+  box-shadow:
+    0 0 0 4px rgba(142, 92, 255, 0.2),
+    0 10px 22px rgba(0, 0, 0, 0.22);
+}
+
+.relation-node.is-related {
+  border-color: rgba(153, 118, 255, 0.36);
+}
+
+.relation-node.is-muted {
+  opacity: 0.32;
+}
+
+.relations-details-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.relations-details-header h3 {
+  color: #f3efff;
+  font-size: 1.05rem;
+}
+
+.relations-details-header span {
+  color: #bcb2df;
+  font-size: 0.9rem;
+}
+
+.relations-details-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 2px;
+  scrollbar-gutter: stable;
+}
+
+.relations-details-empty {
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #c9bffc;
+}
+
+.relations-details-empty strong {
+  display: block;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.relations-detail-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.relations-detail-title {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.relations-detail-title h4 {
+  color: #fff;
+  font-size: 1.2rem;
+}
+
+.relations-detail-subtitle {
+  color: #bcb2df;
+  line-height: 1.5;
+}
+
+.relations-detail-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.relations-pill {
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #ebe6ff;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.78rem;
+}
+
+.relations-detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.relations-detail-list div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.relations-detail-list dt {
+  color: #8f84c8;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.relations-detail-list dd {
+  color: #efeaff;
+  line-height: 1.55;
+}
+
+.relations-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.relations-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.relations-chip {
+  min-width: 150px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #efeaff;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.relations-chip strong {
+  font-size: 0.92rem;
+  line-height: 1.2;
+}
+
+.relations-chip span {
+  color: #bcb2df;
+  font-size: 0.74rem;
+  line-height: 1.2;
+}
+
+.relations-detail-empty-inline {
+  color: #8f84c8;
+  line-height: 1.6;
+}
+
+@media (max-width: 960px) {
+  .relations-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .relations-graph-stage {
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 720px) {
+  .relation-node-character {
+    width: 110px;
+    height: 110px;
+  }
+
+  .relation-node-item {
+    width: 84px;
+    height: 84px;
+  }
+}
