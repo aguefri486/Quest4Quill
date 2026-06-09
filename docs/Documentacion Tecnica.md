@@ -124,6 +124,16 @@ Detalles de implementacion:
 - el arrastre de nodos actua como una fuerza adicional en la simulacion
 - el zoom y el pan modifican solo la vista, no la estructura del grafo
 
+## Diagramas
+
+Los diagramas del proyecto estan en:
+- `docs/Diagrama de Clases.md`
+- `docs/Diagrama de Datos.md`
+
+Ahí puedes ver:
+- un diagrama de clases del modelo de dominio
+- un diagrama ER del almacenamiento logico en `localStorage`
+
 ## Atajos de ventana
 
 El proceso principal escucha `before-input-event` en la ventana de Electron para alternar el modo pantalla completa cuando el usuario pulsa `F11`.

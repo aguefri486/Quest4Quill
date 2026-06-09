@@ -7,6 +7,8 @@ Quest4Quill es una aplicacion de escritorio con Electron para construir y organi
 - [Manual de Usuario](docs/Manual%20de%20Usuario.md)
 - [Guia de Instalacion](docs/Guia%20de%20Instalacion.md)
 - [Documentacion Tecnica](docs/Documentacion%20Tecnica.md)
+- [Diagrama de Clases](docs/Diagrama%20de%20Clases.md)
+- [Diagrama de Datos](docs/Diagrama%20de%20Datos.md)
 
 ## Resumen
 
